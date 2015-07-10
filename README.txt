@@ -1,5 +1,9 @@
 whereikeepinfo README
 ==================
+Description
+-----------
+
+  whereikeepinfo is simple website application written in the Python Pyramid Framework.
 
 Getting Started
 ---------------
