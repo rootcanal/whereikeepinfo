@@ -7,6 +7,7 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
     config.registry.current_resume = settings['current_resume']
+    config.registry.profile_photo = settings['profile_photo']
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
