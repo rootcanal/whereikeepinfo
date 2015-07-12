@@ -57,8 +57,6 @@ def main(global_config, **settings):
 
     config.registry.current_resume = settings['current_resume']
     config.registry.dbmaker = sessionmaker(bind=engine)
-
-
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
 
