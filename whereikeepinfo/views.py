@@ -50,8 +50,15 @@ def register(request, session):
 
         return HTTPFound(location=redirect_url, headers=headers)
 
+    userid = authenticated_userid(request)
+    if userid is not None:
+        username = session.query(User).filter(id==userid).first()
+    else:
+        username = None
+
     return dict(
-        form=FormRenderer(form)
+        form=FormRenderer(form),
+        username=username
     )
 
 
