@@ -16,7 +16,7 @@ requires = [
     'formencode',
     'pyramid_tm',
     'SQLAlchemy',
-    'cryptacular',
+    'passlib',
     'waitress',
     ]
 

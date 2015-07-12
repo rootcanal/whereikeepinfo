@@ -1,4 +1,4 @@
-import cryptacular.bcrypt
+from passlib.hash import bcrypt
 
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
@@ -9,7 +9,6 @@ from pyramid.security import Authenticated
 from pyramid.security import Everyone
 
 Base = declarative_base()
-crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
 
 
 class User(Base):
@@ -26,7 +25,7 @@ class User(Base):
     def _get_password(self):
         return self._password
     def _set_password(self, password):
-        self._password = crypt.encode(password)
+        self._password = bcrypt.encrypt(password)
 
     password = property(_get_password, _set_password)
     password = sa_orm.synonym('_password', descriptor=password)

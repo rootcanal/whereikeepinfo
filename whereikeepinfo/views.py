@@ -1,5 +1,7 @@
 import os
 
+from passlib.hash import bcrypt
+
 from pyramid.response import Response
 from pyramid.response import FileResponse
 from pyramid.view import view_config
@@ -13,7 +15,6 @@ from pyramid_simpleform.renderers import FormRenderer
 from pyramid_simpleform import Form
 
 from .models import User
-from .models import crypt
 from .forms import RegistrationSchema
 
 
@@ -79,7 +80,7 @@ def login(request, session):
         password = post_data['password']
 
         user = session.query(User).filter(User.username==login).first()
-        if user and crypt.check(user.password, password):
+        if user and bcrypt.verify(password, user.password):
             headers = remember(request, login)
             request.session.flash(u'Logged in successfully.')
             return HTTPFound(location=came_from, headers=headers)
