@@ -1,0 +1,28 @@
+<div metal:use-macro="load: base.pt">
+    <div metal:fill-slot="content">
+        <div class="row">
+            <div class="col-md-2">
+            <img src="${request.static_url('whereikeepinfo:static/profile.jpg')}" style="width:20em; height:20em;">
+            </div>
+            <div class="col-md-20">
+                <div class="content">
+                    <h1><span class="font-semi-bold">Philip Ramsey</span></h1>
+                        <p class="lead">
+                            I am a <span class="font-normal">Software Engineer</span>
+                            based in<span class="font-normal"> Seattle, Washington</span>.<br>
+                            I have extensive experience developing and supporting distributed applications, a deep and abiding love for well designed systems, and a passion for self-improvement.
+                        </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-20">
+                <div class="body">
+                    <p class="left">
+                        I've worked at all levels of the software stack.  I've contributed to open source projects such as <a class="link" href="http://www.caida.org/tools/measurement/scamper/">Scamper</a> and <a class="link" href="http://linux-ip.net/software/#atelerix">Atelerix</a>. I strongly advocate in my work for building systems with a focus on maintainability and extensibility. I work hard to understand the needs and requirements of the clients and projects I work with to deliver on time and high quality software. I thrive in a team setting working collaboratively to grow in each others abilities learning and sharing our experiences developing world class software systems and applications.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

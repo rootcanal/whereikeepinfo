@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Philip Ramsey">
+
+    <title>Where I (Philip Ramsey) Keep Info</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this scaffold -->
+    <link href="${request.static_url('whereikeepinfo:static/theme.css')}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="message" tal:condition="request.session.peek_flash()">
+        <p tal:repeat="message request.session.pop_flash()">
+            ${message}
+        </p>
+    </div>
+    <div class="starter-template">
+      <div class="container">
+        <div metal:define-slot="content">
+        </div>
+        <div class="row">
+          <div class="links">
+            <ul>
+              <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('register')}">Register</a></li>
+              <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('login')}">Login</a></li>
+              <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('logout')}">Logout</a></li>
+              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('resume')}">Résumé</a></li>
+              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/rootcanal/whereikeepinfo">Github Project</a></li>
+              <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="irc://irc.freenode.net#tesc">Find me on IRC</a></li>
+              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('home')}">Home Page</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="copyright">
+            Copyright &copy; 2015 Philip Ramsey All Rights Reserved
+          </div>
+        </div>
+      </div>
+   </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  </body>
+</html>
