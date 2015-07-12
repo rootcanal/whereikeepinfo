@@ -4,7 +4,6 @@ from pyramid_simpleform import Form
 
 class RegistrationSchema(formencode.Schema):
     allow_extra_fields = True
-    allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
     email = formencode.validators.Email(resolve_domain=False)
@@ -15,3 +14,7 @@ class RegistrationSchema(formencode.Schema):
         formencode.validators.FieldsMatch('password', 'confirm_password')
     ]
 
+class LoginSchema(formencode.Schema):
+    allow_extra_fields = True
+    username = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.PlainText(not_empty=True)

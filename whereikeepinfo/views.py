@@ -16,6 +16,14 @@ from pyramid_simpleform import Form
 
 from .models import User
 from .forms import RegistrationSchema
+from .forms import LoginSchema
+
+
+def _get_username(request, session):
+    userid = authenticated_userid(request)
+    print 'userid:', userid
+    if userid is not None:
+        return session.query(User).filter(User.username==userid).first()
 
 
 def resume(request):
@@ -27,9 +35,9 @@ def resume(request):
     return response
 
 
-def home(request):
+def home(request, session):
     return dict(
-        username=authenticated_userid(request),
+        username=_get_username(request, session)
     )
 
 def register(request, session):
@@ -51,22 +59,17 @@ def register(request, session):
 
         return HTTPFound(location=redirect_url, headers=headers)
 
-    userid = authenticated_userid(request)
-    if userid is not None:
-        username = session.query(User).filter(id==userid).first()
-    else:
-        username = None
-
     return dict(
         form=FormRenderer(form),
-        username=username
+        username=_get_username(request, session)
     )
 
 
 def user(request, session, username=None):
     user = session.query(User).filter(username==username).first()
     return dict(
-        user=user
+        user=user,
+        username=user.username
     )
 
 
@@ -74,20 +77,25 @@ def login(request, session):
     home_view = request.route_url('home')
     came_from = request.params.get('came_from', home_view)
 
-    post_data = request.POST
-    if 'submit' in post_data:
-        login = post_data['login']
-        password = post_data['password']
+    form = Form(request, schema=LoginSchema)
 
-        user = session.query(User).filter(User.username==login).first()
+    if 'form.submitted' in request.POST and form.validate():
+        username = form.data['username']
+        password = form.data['password']
+
+        user = session.query(User).filter(User.username==username).first()
         if user and bcrypt.verify(password, user.password):
-            headers = remember(request, login)
+            headers = remember(request, username)
             request.session.flash(u'Logged in successfully.')
             return HTTPFound(location=came_from, headers=headers)
 
         request.session.flash(u'Failed to login.')
         return HTTPFound(location=came_from)
-    return dict(logged_in=authenticated_userid(request))
+    return dict(
+        logged_in=authenticated_userid(request),
+        form=FormRenderer(form),
+        username=_get_username(request, session)
+    )
 
 
 def logout(request):
