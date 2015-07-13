@@ -1,0 +1,10 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="load: base.pt">
+
+<div metal:fill-slot="content">
+    <p tal:condition="username">Welcome to the whereikeepinfo network. We are happy you are here</p>
+    <p tal:condition="not username">Sorry we weren't able to verify your account. Are you a bad actor?</p>
+</div>
+</html>

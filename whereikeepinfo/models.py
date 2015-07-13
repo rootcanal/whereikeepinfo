@@ -15,9 +15,12 @@ class User(Base):
 
     __tablename__ = 'users'
     id = sa.Column(sa.INTEGER, primary_key=True)
+    created_at = sa.Column(sa.INTEGER, nullable=False)
     username = sa.Column(sa.TEXT, unique=True, nullable=False)
     name = sa.Column(sa.TEXT, nullable=False)
-    email = sa.Column(sa.TEXT, nullable=False)
+    email = sa.Column(sa.TEXT, unique=True, nullable=False)
+    verified = sa.Column(sa.BOOLEAN, nullable=False, default=False)
+    verified_at = sa.Column(sa.INTEGER, nullable=True)
     last_probe = sa.Column(sa.INTEGER)
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
@@ -30,11 +33,12 @@ class User(Base):
     password = property(_get_password, _set_password)
     password = sa_orm.synonym('_password', descriptor=password)
 
-    def __init__(self, username, name, email, password):
+    def __init__(self, username, name, email, password, created_at):
         self.username = username
         self.name = name
         self.email = email
         self.password = password
+        self.created_at = created_at
 
 
 class RootFactory(object):

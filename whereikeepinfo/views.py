@@ -1,7 +1,8 @@
 import os
+import smtplib
+import time
 
 from passlib.hash import bcrypt
-
 from pyramid.response import Response
 from pyramid.response import FileResponse
 from pyramid.view import view_config
@@ -10,9 +11,9 @@ from pyramid.security import remember
 from pyramid.security import forget
 from pyramid.renderers import render
 from pyramid.httpexceptions import HTTPFound
-
 from pyramid_simpleform.renderers import FormRenderer
 from pyramid_simpleform import Form
+from itsdangerous import URLSafeTimedSerializer
 
 from .models import User
 from .forms import RegistrationSchema
@@ -49,13 +50,33 @@ def register(request, session):
             username=username,
             password=form.data['password'],
             name=form.data['name'],
-            email=form.data['email']
+            email=form.data['email'],
+            created_at=time.time()
         )
         session.add(user)
+
+        serializer = URLSafeTimedSerializer(request.registry.verification_key)
+        token = serializer.dumps(form.data['email'], salt=request.registry.verification_salt)
+        token_url = request.route_url('verify', token=token)
+
+        server = smtplib.SMTP(request.registry.email_server, request.registry.email_port)
+        server.ehlo()
+        server.starttls()
+        server.login(request.registry.email_user, request.registry.email_password)
+        body = '\r\n'.join(['To: %s' % (form.data['email'], ),
+                            'From: %s' % (request.registry.email_user, ),
+                            'Subject: %s' % ('Thanks for registering at whereikeep.info', ),
+                            '',
+                            'Click here to complete registration %s' % (token_url, )
+                           ])
+        server.sendmail(request.registry.email_user, [form.data['email']], body)
 
         headers = remember(request, username)
 
         redirect_url = request.route_url('home')
+
+        request.session.flash(u'Registration email sent. '\
+                               'Follow instructions in email to complete registration')
 
         return HTTPFound(location=redirect_url, headers=headers)
 
@@ -63,6 +84,29 @@ def register(request, session):
         form=FormRenderer(form),
         username=_get_username(request, session)
     )
+
+
+def verify(request, session, token=None):
+
+    serializer = URLSafeTimedSerializer(request.registry.verification_key)
+    try:
+        email = serializer.loads(
+            token,
+            salt=request.registry.verification_salt,
+            max_age=3600
+        )
+    except:
+        request.session.flash(u'Unable to verify your account. sry...')
+    request.session.flash(u'Account verified!')
+
+    user = session.query(User).filter(email==email).first()
+    user.verified = True
+    user.verified_at = time.time()
+    session.update(user)
+
+    headers = remember(request, user.username)
+
+    return dict(username=user.username, user=user)
 
 
 def user(request, session, username=None):

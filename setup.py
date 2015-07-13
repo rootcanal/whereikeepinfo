@@ -17,6 +17,7 @@ requires = [
     'pyramid_tm',
     'SQLAlchemy',
     'passlib',
+    'itsdangerous',
     'waitress',
     ]
 

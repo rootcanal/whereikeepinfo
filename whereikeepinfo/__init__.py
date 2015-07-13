@@ -41,13 +41,30 @@ def create_routes(config, routes, sessioned=False, paramed=False):
         config.add_view(view, route_name=name, renderer=renderer, permission=perms)
 
 
+def update_registry(config, settings):
+    config.registry.current_resume = settings['current_resume']
+
+    # itsdangerous-specific key and salt for serializing verification links
+    config.registry.verification_key = settings['verification_key']
+    config.registry.verification_salt = settings['verification_salt']
+
+    # all the bits for actually sending out the verification emails
+    config.registry.email_user = settings['email_user']
+    config.registry.email_password = settings['email_password']
+    config.registry.email_server = settings['email_server']
+    config.registry.email_port = settings['email_port']
+
+    # our session maker object to be set up on request
+    engine = engine_from_config(settings, prefix='sqlalchemy.')
+    config.registry.dbmaker = sessionmaker(bind=engine)
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     authn_policy = SessionAuthenticationPolicy()
     authz_policy = ACLAuthorizationPolicy()
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['session.secret'])
-    engine = engine_from_config(settings, prefix='sqlalchemy.')
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           authentication_policy=authn_policy,
@@ -55,8 +72,8 @@ def main(global_config, **settings):
                           session_factory=session_factory
                          )
 
-    config.registry.current_resume = settings['current_resume']
-    config.registry.dbmaker = sessionmaker(bind=engine)
+    update_registry(config, settings)
+
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
 
@@ -73,6 +90,7 @@ def main(global_config, **settings):
     fancy_routes = [('home', '/', 'view', 'templates/home.pt'),
                     ('user', '/users/{username}', 'post', 'templates/user.pt'),
                     ('register', '/register', 'view', 'templates/register.pt'),
+                    ('verify', '/verify/{token}', 'view', 'templates/verify.pt'),
                     ('login', '/login', 'view', 'templates/login.pt'),
                    ]
 
