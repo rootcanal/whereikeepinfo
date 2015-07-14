@@ -78,7 +78,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
 
     # no fanciness for these. Don't even need to hit the db
-    basic_routes = [('resume', '/resume', 'view', None),
+    basic_routes = [('resume', '/about/resume', 'view', None),
                     ('logout', '/logout', 'view', 'templates/logout.pt'),
                    ]
 
@@ -87,7 +87,7 @@ def main(global_config, **settings):
     # these dealies have a bit more going on. it's convenient to have the session and parms
     # readily available. cuts down the boilerplate significantly i find
     # tuples are (name, route, permissions, template). name is used for route_name, view_name
-    fancy_routes = [('home', '/', 'view', 'templates/home.pt'),
+    fancy_routes = [('about', '/about', 'view', 'templates/about.pt'),
                     ('user', '/users/{username}', 'post', 'templates/user.pt'),
                     ('register', '/register', 'view', 'templates/register.pt'),
                     ('verify', '/verify/{token}', 'view', 'templates/verify.pt'),

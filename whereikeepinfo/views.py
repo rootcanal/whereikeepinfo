@@ -36,7 +36,7 @@ def resume(request):
     return response
 
 
-def home(request, session):
+def about(request, session):
     return dict(
         username=_get_username(request, session)
     )
