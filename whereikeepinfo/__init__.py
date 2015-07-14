@@ -86,7 +86,7 @@ def main(global_config, **settings):
 
     # these dealies have a bit more going on. it's convenient to have the session and parms
     # readily available. cuts down the boilerplate significantly i find
-    # tuples are (name, route, permissions). name is used for route_name, view_name and renderer
+    # tuples are (name, route, permissions, template). name is used for route_name, view_name and renderer
     fancy_routes = [('home', '/', 'view', 'templates/home.pt'),
                     ('user', '/users/{username}', 'post', 'templates/user.pt'),
                     ('register', '/register', 'view', 'templates/register.pt'),
