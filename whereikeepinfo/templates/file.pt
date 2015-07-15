@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="load: base.pt">
+
+<tal:block metal:fill-slot="content">
+    <h1>Upload File</h1>
+    <form action="/files" method="post" accept-charset="utf-8"
+          enctype="multipart/form-data">
+    
+        <label for="uploaded_file">File</label>
+        <input id="uploaded_file" name="uploaded_file" type="file" value="" />
+    
+        <input type="submit" value="submit" />
+    </form>
+    <div class='row'>
+        <div class="links">
+            <ul>
+                <tal:block repeat="item uploaded_files">
+                    <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('file', filename=item.name)}">${item.name}</a></li>
+                </tal:block>
+            </ul>
+            <br><br><br>
+        </div>
+    </div>
+</tal:block>
+</html>
