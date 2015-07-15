@@ -58,6 +58,9 @@ def update_registry(config, settings):
     engine = engine_from_config(settings, prefix='sqlalchemy.')
     config.registry.dbmaker = sessionmaker(bind=engine)
 
+    # where we store the info that we keep for the users
+    config.registry.storage_dir = settings['storage_dir']
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -88,6 +91,9 @@ def main(global_config, **settings):
     # readily available. cuts down the boilerplate significantly i find
     # tuples are (name, route, permissions, template). name is used for route_name, view_name
     fancy_routes = [('about', '/about', 'view', 'templates/about.pt'),
+                    ('home', '/', 'view', 'templates/home.pt'),
+                    ('files', '/files', 'view', 'templates/file.pt'),
+                    ('file', '/files/{filename}', 'view', None), 
                     ('user', '/users/{username}', 'post', 'templates/user.pt'),
                     ('register', '/register', 'view', 'templates/register.pt'),
                     ('verify', '/verify/{token}', 'view', 'templates/verify.pt'),
