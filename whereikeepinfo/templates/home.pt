@@ -1,0 +1,23 @@
+<div metal:use-macro="load: base.pt">
+    <div metal:fill-slot="content">
+        <div class="row">
+            <div class="col-md-2">
+            <img src="${request.static_url('whereikeepinfo:static/workinman.jpg')}" style="width:20em; height:20em;">
+            </div>
+            <div class="col-md-20">
+                <div class="content">
+                    <h1><span class="font-semi-bold">Welcome to Whereikeepinfo</span></h1>
+                        <p class="lead">
+                            This site is a collection of personal pet projects and resources that I've begun. Below is a list of project links. Register to create an account and gain access to check stuffs out.
+                        </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+          <div class="links">
+            <ul>
+              <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('files')}">whereikeepfiles</a></li>
+          </div>
+        </div>
+    </div>
+</div>
