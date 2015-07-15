@@ -1,6 +1,31 @@
 import formencode
+import os
 
 from pyramid_simpleform import Form
+
+
+class FileValidator(formencode.FancyValidator):
+    __unpackargs__ = ('upload_field', 'max_upload_size')
+
+    def _to_python(self, field_storage, state):
+        print 'valdict', field_storage
+        if field_storage is None:
+            print 'wat'
+            return field_storage
+        fileobj = field_storage.file
+        fileobj.seek(0, os.SEEK_END)
+        size = int(fileobj.tell())
+        if size > int(self.max_upload_size):
+            raise formencode.Invalid(
+                _('File too big'),
+                field_storage, state,
+                error_dict={self.upload_field:
+                    formencode.Invalid(_('File too big'), field_storage, state)})
+        fileobj.seek(0)
+        ret = dict(filename=field_storage.filename, file=fileobj, size=size)
+        print ret
+        return ret
+
 
 class RegistrationSchema(formencode.Schema):
     allow_extra_fields = True
@@ -18,3 +43,7 @@ class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
     password = formencode.validators.PlainText(not_empty=True)
+
+class UploadFileSchema(formencode.Schema):
+    allow_extra_fields = True
+    uploaded_file = FileValidator(upload_field='uploaded_file', max_upload_size=10485760)
