@@ -1,3 +1,5 @@
+import time
+
 from passlib.hash import bcrypt
 
 import sqlalchemy as sa
@@ -22,6 +24,7 @@ class User(Base):
     verified = sa.Column(sa.BOOLEAN, nullable=False, default=False)
     verified_at = sa.Column(sa.INTEGER, nullable=True)
     last_probe = sa.Column(sa.INTEGER)
+    files = sa_orm.relationship('File', backref='user')
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
 
@@ -39,6 +42,22 @@ class User(Base):
         self.email = email
         self.password = password
         self.created_at = created_at
+
+
+class File(Base):
+    __tablename__ = 'files'
+    id = sa.Column(sa.INTEGER, primary_key=True)
+    uploaded_at = sa.Column(sa.INTEGER, nullable=False)
+    deleted_at = sa.Column(sa.INTEGER)
+    name = sa.Column(sa.TEXT, unique=True)
+    size = sa.Column(sa.INTEGER, nullable=False)
+    user_id = sa.Column(sa.INTEGER, sa.ForeignKey('users.id'))
+
+    def __init__(self, name, size, user_id):
+        self.name = name
+        self.size = size
+        self.user_id = user_id
+        self.uploaded_at = time.time()
 
 
 class RootFactory(object):
