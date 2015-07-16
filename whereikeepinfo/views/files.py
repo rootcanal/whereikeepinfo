@@ -1,4 +1,5 @@
 import os
+import time
 import mimetypes
 
 from pyramid.response import FileResponse
@@ -41,7 +42,7 @@ class FilesView(BaseView):
                 user.files.append(fileobj)
                 session.add(user)
 
-            return view_files(self)
+        return HTTPFound(location=self.request.route_url('files'))
 
     @view_config(request_method='GET')
     def view_files(self):
@@ -67,17 +68,26 @@ class FilesView(BaseView):
 
     @view_config(route_name='file')
     def view_file(self):
+        print self.__dict__
         if self.username is None:
             self.request.session.flash(u'You must be logged in to view files.')
             return HTTPFound(location=self.request.route_url('login'))
-        outf = os.path.join(self.storage_dir, self.username, self.filename)
-        if not os.path.isfile(outf):
-            return HTTPNotFound("file %s is not a thinger" % (outf, ))
-        content_type, encoding = mimetypes.guess_type(outf)
-        response = FileResponse(
-            outf,
-            request=self.request,
-            content_type=content_type,
-            content_encoding=encoding
-        )
+        query_file = os.path.join(self.storage_dir, self.username, self.filename)
+        if not os.path.isfile(query_file):
+            return HTTPNotFound("file %s is not a thinger" % (self.filename, ))
+        if 'delete' in self.__dict__ and self.delete:
+            with utils.db_session(self.dbmaker) as session:
+                f = session.query(File).filter(File.name==self.filename).first()
+                session.delete(f)
+            os.remove(query_file)
+            self.request.session.flash(u'successfully deleted file: %s.' % (self.filename, ))
+            response = HTTPFound(location=self.request.route_url('files'))
+        else:
+            content_type, encoding = mimetypes.guess_type(query_file)
+            response = FileResponse(
+                query_file,
+                request=self.request,
+                content_type=content_type,
+                content_encoding=encoding
+            )
         return response

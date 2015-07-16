@@ -13,15 +13,17 @@
     
         <input type="submit" value="submit" />
     </form>
-    <div class='row'>
-        <div class="links">
-            <ul>
-                <tal:block repeat="item uploaded_files">
-                    <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('file', filename=item)}">${item}</a></li>
-                </tal:block>
-            </ul>
-            <br><br><br>
+    <tal:block repeat="item uploaded_files">
+        <div class='row'>
+            <div class="links">
+                <ul>
+                    <li><i class="glyphicon glyphicon-paperclip icon-muted"> ${item}</i></li>
+                    <li><i class="glyphicon glyphicon-ok icon-muted"></i><a href="${request.route_url('file', filename=item)}">View</a></li>
+                    <li><i class="glyphicon glyphicon-remove icon-muted"></i><a href="${request.route_url('file', filename=item, _query={'delete': True})}">Delete</a></li>
+                </ul>
+            </div>
         </div>
-    </div>
+    </tal:block>
+    <br><br><br>
 </tal:block>
 </html>

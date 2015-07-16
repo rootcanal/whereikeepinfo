@@ -48,7 +48,6 @@ class File(Base):
     __tablename__ = 'files'
     id = sa.Column(sa.INTEGER, primary_key=True)
     uploaded_at = sa.Column(sa.INTEGER, nullable=False)
-    deleted_at = sa.Column(sa.INTEGER)
     name = sa.Column(sa.TEXT, unique=True)
     size = sa.Column(sa.INTEGER, nullable=False)
     user_id = sa.Column(sa.INTEGER, sa.ForeignKey('users.id'))
