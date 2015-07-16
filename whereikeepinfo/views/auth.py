@@ -98,7 +98,9 @@ class AuthView(BaseView):
                 username=user.username,
                 email=user.email,
                 created_at=user.created_at,
-                verified_at=user.verified_at
+                verified=user.verified_at is not None,
+                sharable=user.sharable,
+                filecount=len(user.files)
             )
 
     @view_config(route_name='login', renderer='whereikeepinfo:templates/login.pt')

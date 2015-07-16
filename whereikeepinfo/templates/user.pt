@@ -1,13 +1,29 @@
 <div metal:use-macro="load: base.pt">
     <tal:block metal:fill-slot="content">
-        <h1>${name}</h1>
         <div class='row'>
             <div class="links">
+                <h1>${name}</h1>
                 <ul>
                     <li><i class="glyphicon glyphicon-girl icon-muted"> username: </i><a>${username}</a></li>
                     <li><i class="glyphicon glyphicon-envelope icon-muted"> email: </i><a>${email}</a></li>
+                    <li tal:condition="sharable"><i class="glyphicon glyphicon-thumbs-up icon-muted"> sharable</i><a></a></li>
+                    <li tal:condition="not sharable"><i class="glyphicon glyphicon-thumbs-down icon-muted"> not sharable</i><a></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class='row'>
+            <div class="links">
+                <ul>
                     <li><i class="glyphicon glyphicon-hand-up icon-muted"> account created at: </i><a>${created_at}</a></li>
-                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> account verified at: </i><a>${verified_at}</a></li>
+                    <li tal:condition="verified"><i class="glyphicon glyphicon-thumbs-up icon-muted"> account verified</i></li>
+                    <li tal:condition="not verified"><i class="glyphicon glyphicon-thumbs-down icon-muted"> account not verified</i></li>
+                </ul>
+            </div>
+        </div>
+        <div class='row'>
+            <div class="links">
+                <ul>
+                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> uploaded files count: </i><a href="${request.route_url('files')}">${filecount}</a></li>
                 </ul>
             </div>
         </div>

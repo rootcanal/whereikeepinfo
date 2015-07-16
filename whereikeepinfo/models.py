@@ -22,6 +22,7 @@ class User(Base):
     name = sa.Column(sa.TEXT, nullable=False)
     email = sa.Column(sa.TEXT, unique=True, nullable=False)
     verified_at = sa.Column(sa.INTEGER, nullable=True)
+    sharable = sa.Column(sa.BOOLEAN, default=False, nullable=False)
     files = sa_orm.relationship('File', backref='user')
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
