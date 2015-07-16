@@ -68,7 +68,6 @@ class FilesView(BaseView):
 
     @view_config(route_name='file')
     def view_file(self):
-        print self.__dict__
         if self.username is None:
             self.request.session.flash(u'You must be logged in to view files.')
             return HTTPFound(location=self.request.route_url('login'))
