@@ -37,6 +37,7 @@
               <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('register')}">Register</a></li>
               <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('login')}">Login</a></li>
               <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('logout')}">Logout</a></li>
+              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('about')}">About Me</a></li>
               <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('resume')}">Résumé</a></li>
               <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/rootcanal/whereikeepinfo">Github Project</a></li>
               <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="irc://irc.freenode.net#tesc">Find me on IRC</a></li>

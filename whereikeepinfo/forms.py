@@ -8,9 +8,7 @@ class FileValidator(formencode.FancyValidator):
     __unpackargs__ = ('upload_field', 'max_upload_size')
 
     def _to_python(self, field_storage, state):
-        print 'valdict', field_storage
         if field_storage is None:
-            print 'wat'
             return field_storage
         fileobj = field_storage.file
         fileobj.seek(0, os.SEEK_END)
@@ -22,9 +20,7 @@ class FileValidator(formencode.FancyValidator):
                 error_dict={self.upload_field:
                     formencode.Invalid(_('File too big'), field_storage, state)})
         fileobj.seek(0)
-        ret = dict(filename=field_storage.filename, file=fileobj, size=size)
-        print ret
-        return ret
+        return dict(filename=field_storage.filename, file=fileobj, size=size)
 
 
 class RegistrationSchema(formencode.Schema):

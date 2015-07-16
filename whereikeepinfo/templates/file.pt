@@ -17,7 +17,7 @@
         <div class="links">
             <ul>
                 <tal:block repeat="item uploaded_files">
-                    <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('file', filename=item.name)}">${item.name}</a></li>
+                    <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('file', filename=item)}">${item}</a></li>
                 </tal:block>
             </ul>
             <br><br><br>
