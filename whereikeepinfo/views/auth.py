@@ -90,12 +90,15 @@ class AuthView(BaseView):
             return dict(username=user.username, user=user)
 
     @view_config(route_name='user', renderer='whereikeepinfo:templates/user.pt')
-    def user(request):
+    def user(self):
         with utils.db_session(self.dbmaker) as session:
-            user = session.query(User).filter(username==username).first()
+            user = session.query(User).filter(User.username==self.username).first()
             return dict(
-                user=user,
-                username=user.username
+                name=user.name,
+                username=user.username,
+                email=user.email,
+                created_at=user.created_at,
+                verified_at=user.verified_at
             )
 
     @view_config(route_name='login', renderer='whereikeepinfo:templates/login.pt')

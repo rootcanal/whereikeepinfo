@@ -1,9 +1,9 @@
 <div metal:use-macro="load: base.pt">
     <tal:block metal:fill-slot="content">
-        <h1>${user.name}</h1>
-        <p>login: <b class="byline">${user.username}</b>.</p>
-        <p>email: <b class="byline">${user.email}</b>.</p>
-        <h3 class="subtitle">Last Probe</h3>
-        <p>Timestamp: <b class="hits">${user.last_probe}</b>.</p>
+        <h1>${name}</h1>
+        <p>login: <b class="byline">${username}</b>.</p>
+        <p>email: <b class="byline">${email}</b>.</p>
+        <p>account created at: <b class="byline">${created_at}</b>.</p>
+        <p>account verified at: <b class="byline">${verified_at}</b>.</p>
     </tal:block>
 </div>
