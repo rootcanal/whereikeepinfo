@@ -1,9 +1,16 @@
 <div metal:use-macro="load: base.pt">
     <tal:block metal:fill-slot="content">
         <h1>${name}</h1>
-        <p>login: <b class="byline">${username}</b>.</p>
-        <p>email: <b class="byline">${email}</b>.</p>
-        <p>account created at: <b class="byline">${created_at}</b>.</p>
-        <p>account verified at: <b class="byline">${verified_at}</b>.</p>
+        <div class='row'>
+            <div class="links">
+                <ul>
+                    <li><i class="glyphicon glyphicon-girl icon-muted"> username: </i><a>${username}</a></li>
+                    <li><i class="glyphicon glyphicon-envelope icon-muted"> email: </i><a>${email}</a></li>
+                    <li><i class="glyphicon glyphicon-hand-up icon-muted"> account created at: </i><a>${created_at}</a></li>
+                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> account verified at: </i><a>${verified_at}</a></li>
+                </ul>
+            </div>
+        </div>
+        <br><br><br>
     </tal:block>
 </div>
