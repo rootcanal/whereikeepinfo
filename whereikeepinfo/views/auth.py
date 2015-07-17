@@ -1,4 +1,5 @@
 import smtplib
+import time
 
 from passlib.hash import bcrypt
 from pyramid_simpleform.renderers import FormRenderer
@@ -19,6 +20,32 @@ from whereikeepinfo import forms
 @view_defaults(route_name='auth')
 class AuthView(BaseView):
 
+    @view_config(route_name='send_verify')
+    def send_verify(self):
+        if self.username is None:
+            self.request.session.flash(u'You must be logged in to edit your account.')
+            return HTTPFound(location=self.request.route_url('login'))
+        with utils.db_session(self.dbmaker) as session:
+            email = session.query(User.email).filter(User.username==self.username).first()
+        serializer = URLSafeTimedSerializer(self.verification_key)
+        token = serializer.dumps(email, salt=self.verification_salt)
+        token_url = self.request.route_url('verify', token=token)
+    
+        server = smtplib.SMTP(self.email_server, self.email_port)
+        server.ehlo()
+        server.starttls()
+        server.login(self.email_user, self.email_password)
+        body = '\r\n'.join(['To: %s' % (email, ),
+                            'From: %s' % (self.email_user, ),
+                            'Subject: %s' % ('Thanks for registering at whereikeep.info', ),
+                            '',
+                            'Click here to complete registration %s' % (token_url, )
+                           ])
+        server.sendmail(self.email_user, [email], body)
+        self.request.session.flash(u'Registration email sent. '\
+            'Follow instructions in email to complete registration')
+        return HTTPFound(location=self.request.route_url('home'))
+
     @view_config(route_name='register', renderer='whereikeepinfo:templates/register.pt')
     def register(self):
         form = Form(self.request, schema=forms.RegistrationSchema)
@@ -34,31 +61,8 @@ class AuthView(BaseView):
             )
             with utils.db_session(self.dbmaker) as session:
                 session.add(user)
-    
-            serializer = URLSafeTimedSerializer(self.verification_key)
-            token = serializer.dumps(form.data['email'], salt=self.verification_salt)
-            token_url = self.request.route_url('verify', token=token)
-    
-            server = smtplib.SMTP(self.email_server, self.email_port)
-            server.ehlo()
-            server.starttls()
-            server.login(self.email_user, self.email_password)
-            body = '\r\n'.join(['To: %s' % (form.data['email'], ),
-                                'From: %s' % (self.email_user, ),
-                                'Subject: %s' % ('Thanks for registering at whereikeep.info', ),
-                                '',
-                                'Click here to complete registration %s' % (token_url, )
-                               ])
-            server.sendmail(self.email_user, [form.data['email']], body)
-    
             headers = remember(self.request, username)
-    
-            redirect_url = self.request.route_url('home')
-    
-            self.request.session.flash(u'Registration email sent. '\
-                'Follow instructions in email to complete registration')
-    
-            return HTTPFound(location=redirect_url, headers=headers)
+            return HTTPFound(location=self.request.route_url('send_verify'), headers=headers)
     
         return dict(
             form=FormRenderer(form),
@@ -71,26 +75,32 @@ class AuthView(BaseView):
         serializer = URLSafeTimedSerializer(self.verification_key)
         try:
             email = serializer.loads(
-                token,
+                self.token,
                 salt=self.verification_salt,
                 max_age=3600
-            )
-        except:
+            )['email']
+        except Exception as e:
             self.request.session.flash(u'Unable to verify your account. sry...')
-        self.request.session.flash(u'Account verified!')
+            return HTTPFound(location=self.request.route_url('home'))
+
+        print email
 
         with utils.db_session(self.dbmaker) as session:
-            user = session.query(User).filter(email==email).first()
+            user = session.query(User).filter(User.email==email).first()
             user.verified = True
             user.verified_at = time.time()
             session.add(user)
     
             headers = remember(self.request, user.username)
     
-            return dict(username=user.username, user=user)
+            self.request.session.flash(u'Account verified!')
+            return HTTPFound(location=self.request.route_url('home'))
 
     @view_config(route_name='user', renderer='whereikeepinfo:templates/user.pt')
     def user(self):
+        if self.username is None:
+            self.request.session.flash(u'You must be logged in to view your account.')
+            return HTTPFound(location=self.request.route_url('login'))
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             return dict(
@@ -102,6 +112,17 @@ class AuthView(BaseView):
                 sharable=user.sharable,
                 filecount=len(user.files)
             )
+
+    @view_config(route_name='toggle_sharability')
+    def toggle_sharability(self):
+        if self.username is None:
+            self.request.session.flash(u'You must be logged in to edit your account.')
+            return HTTPFound(location=self.request.route_url('login'))
+        with utils.db_session(self.dbmaker) as session:
+            user = session.query(User).filter(User.username==self.username).first()
+            user.sharable = not user.sharable
+            session.add(user)
+        return HTTPFound(location=self.request.route_url('user', userid=self.username))
 
     @view_config(route_name='login', renderer='whereikeepinfo:templates/login.pt')
     def login(self):
