@@ -1,7 +1,6 @@
 import smtplib
 import time
 
-from passlib.hash import bcrypt
 from pyramid_simpleform.renderers import FormRenderer
 from pyramid_simpleform import Form
 from pyramid.view import view_config
@@ -24,7 +23,7 @@ class AuthView(BaseView):
     def send_verify(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to edit your account.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='send_verify'))
         with utils.db_session(self.dbmaker) as session:
             email = session.query(User.email).filter(User.username==self.username).first()
         serializer = URLSafeTimedSerializer(self.verification_key)
@@ -69,38 +68,38 @@ class AuthView(BaseView):
             username=self.username
         )
 
-    @view_config(route_name='verify')
+    @view_config(route_name='verify', renderer='whereikeepinfo:templates/verify.pt')
     def verify(self):
-
-        serializer = URLSafeTimedSerializer(self.verification_key)
-        try:
-            email = serializer.loads(
-                self.token,
-                salt=self.verification_salt,
-                max_age=3600
-            )['email']
-        except Exception as e:
-            self.request.session.flash(u'Unable to verify your account. sry...')
+        email = utils.verify_email(self.token, self.verification_key, self.verification_salt)
+        if not email:
+            self.request.session.flash(u'Unable to verify your email account')
             return HTTPFound(location=self.request.route_url('home'))
-
-        print email
-
-        with utils.db_session(self.dbmaker) as session:
-            user = session.query(User).filter(User.email==email).first()
-            user.verified = True
-            user.verified_at = time.time()
-            session.add(user)
-    
-            headers = remember(self.request, user.username)
-    
-            self.request.session.flash(u'Account verified!')
-            return HTTPFound(location=self.request.route_url('home'))
+        form = Form(self.request, schema=forms.LoginSchema)
+        if 'form.submitted' in self.request.POST:
+            if not utils.authenticate_user(form, self.request, self.dbmaker):
+                self.request.session.flash(u'Failed to verify your account credentials')
+                return HTTPFound(location=self.request.route_url('home'))
+            headers = remember(self.request, self.username)
+            with utils.db_session(self.dbmaker) as session:
+                user = session.query(User).filter(User.email==email).first()
+                (pub, priv) = utils.keygen(user, form.data['password'])
+                user.verified_at = time.time()
+                user.public_key = pub
+                user.private_key = priv
+                session.add(user)
+                self.request.session.flash(u'Account verified!')
+                return HTTPFound(location=self.request.route_url('home'))
+        return dict(
+            form=FormRenderer(form),
+            username=self.username,
+            token=self.token
+        )
 
     @view_config(route_name='user', renderer='whereikeepinfo:templates/user.pt')
     def user(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to view your account.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='user'))
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             return dict(
@@ -117,7 +116,7 @@ class AuthView(BaseView):
     def toggle_sharability(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to edit your account.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='toggle_sharability'))
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             user.sharable = not user.sharable
@@ -126,28 +125,19 @@ class AuthView(BaseView):
 
     @view_config(route_name='login', renderer='whereikeepinfo:templates/login.pt')
     def login(self):
+        came_from = self.request.params.get('came_from', self.request.route_url('home'))
         form = Form(self.request, schema=forms.LoginSchema)
-        if 'form.submitted' in self.request.POST and form.validate():
-            username = form.data['username']
-            password = form.data['password']
-
-            came_from = self.request.url 
-            if came_from == self.request.route_url('login'):
-                came_from = self.request.route_url('home')
-
-            with utils.db_session(self.dbmaker) as session:
-                user = session.query(User).filter(User.username==username).first()
-
-                if user and bcrypt.verify(password, user.password):
-                    headers = remember(self.request, username)
-                    self.request.session.flash(u'Logged in successfully.')
-                    return HTTPFound(location=came_from, headers=headers)
-    
+        if 'form.submitted' in self.request.POST:
+            if utils.authenticate_user(form, self.request, self.dbmaker):
+                headers = remember(self.request, form.data['username'])
+                self.request.session.flash(u'Logged in successfully.')
+                return HTTPFound(location=came_from, headers=headers)
             self.request.session.flash(u'Failed to login.')
             return HTTPFound(location=came_from)
         return dict(
             form=FormRenderer(form),
-            username=self.username
+            username=self.username,
+            came_from=came_from
         )
 
     @view_config(route_name='logout')

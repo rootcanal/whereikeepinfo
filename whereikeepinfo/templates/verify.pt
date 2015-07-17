@@ -6,5 +6,20 @@
 <div metal:fill-slot="content">
     <p tal:condition="username">Welcome to the whereikeepinfo network. We are happy you are here</p>
     <p tal:condition="not username">Sorry we weren't able to verify your account. Are you a bad actor?</p>
+    <h1>Login</h1>
+    ${form.begin(request.route_url('verify', token=token))}
+        <fieldset>
+            ${form.csrf_token()}
+            ${form.errorlist('username')}
+            ${form.label('username', 'Username:')}
+            ${form.text('username')}
+            <br />
+            ${form.errorlist('password')}
+            ${form.label('password', 'Password:')}
+            ${form.password('password')}
+            ${form.submit('form.submitted', 'Log In', class_='name')}
+        </fieldset>
+    ${form.end()}
 </div>
+
 </html>

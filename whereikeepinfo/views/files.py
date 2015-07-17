@@ -25,7 +25,7 @@ class FilesView(BaseView):
     def upload_file(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='files'))
 
         form = Form(self.request, schema=forms.UploadFileSchema)
 
@@ -51,7 +51,7 @@ class FilesView(BaseView):
     def view_files(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', 'files'))
 
         form = Form(self.request, schema=forms.UploadFileSchema)
 
@@ -84,7 +84,7 @@ class FilesView(BaseView):
     def view_file(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to view files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='files'))
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             f = session.query(File).filter(File.name==self.filename).first()
@@ -108,7 +108,7 @@ class FilesView(BaseView):
     def delete_file(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to delete files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='files'))
         query_file = os.path.join(self.storage_dir, self.username, self.filename)
         with utils.db_session(self.dbmaker) as session:
             f = session.query(File).filter(File.name==self.filename).first()
@@ -121,7 +121,7 @@ class FilesView(BaseView):
     def share_file(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to share files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='files'))
         query_file = os.path.join(self.storage_dir, self.username, self.filename)
         share_user = self.share_user
         with utils.db_session(self.dbmaker) as session:
@@ -138,7 +138,7 @@ class FilesView(BaseView):
     def unshare_file(self):
         if self.username is None:
             self.request.session.flash(u'You must be logged in to share files.')
-            return HTTPFound(location=self.request.route_url('login'))
+            return HTTPFound(location=self.request.route_url('login', came_from='files'))
         query_file = os.path.join(self.storage_dir, self.username, self.filename)
         with utils.db_session(self.dbmaker) as session:
             f = session.query(File).filter(File.name==self.filename).first()
