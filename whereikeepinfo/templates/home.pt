@@ -13,11 +13,5 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-          <div class="links">
-            <ul>
-              <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('files')}">whereikeepfiles</a></li>
-          </div>
-        </div>
     </div>
 </div>
