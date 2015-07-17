@@ -38,7 +38,7 @@ class RegistrationSchema(formencode.Schema):
 class LoginSchema(formencode.Schema):
     allow_extra_fields = True
     username = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.String(not_empty=True, min=8)
 
 class UploadFileSchema(formencode.Schema):
     allow_extra_fields = True
