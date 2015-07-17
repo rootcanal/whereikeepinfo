@@ -39,10 +39,15 @@ def main(global_config, **settings):
               ('logout', '/logout'),
               ('home', '/'),
               ('files', '/files'),
-              ('file', '/files/{filename}'), 
-              ('user', '/users/{username}'),
+              ('view_file', '/files/view/{filename}'), 
+              ('delete_file', '/files/delete/{filename}'), 
+              ('share_file', '/files/share/{filename}'), 
+              ('unshare_file', '/files/unshare/{filename}/{unshare_user}'), 
+              ('user', '/users/{userid}'),
+              ('toggle_sharability', '/users/{userid}/toggle_sharability'),
               ('register', '/register'),
               ('verify', '/verify/{token}'),
+              ('send_verify', '/verify'),
               ('login', '/login'),
               ('about', '/about')
              ]

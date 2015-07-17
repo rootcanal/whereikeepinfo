@@ -13,17 +13,47 @@
     
         <input type="submit" value="submit" />
     </form>
-    <tal:block repeat="item uploaded_files">
+    <tal:block repeat="file uploaded_files.keys()">
         <div class='row'>
             <div class="links">
                 <ul>
-                    <li><i class="glyphicon glyphicon-paperclip icon-muted"> ${item}</i></li>
-                    <li><i class="glyphicon glyphicon-ok icon-muted"></i><a href="${request.route_url('file', filename=item)}">View</a></li>
-                    <li><i class="glyphicon glyphicon-remove icon-muted"></i><a href="${request.route_url('file', filename=item, _query={'delete': True})}">Delete</a></li>
+                    <li><i class="glyphicon glyphicon-paperclip icon-muted"> ${file}</i></li>
+                    <li><i class="glyphicon glyphicon-ok icon-muted"></i><a href="${request.route_url('view_file', filename=file)}">View</a></li>
+                    <li><i class="glyphicon glyphicon-remove icon-muted"></i><a href="${request.route_url('delete_file', filename=file)}">Delete</a></li>
+                </ul>
+                <ul>
+                    <li>
+                        <i class="glyphicon glyphicon-user-add icon-muted"> Sharing With</i>
+                            <tal:block repeat="user uploaded_files[file]">
+                                <i class="glyphicon glyphicon-remove icon-muted"></i><a href="${request.route_url('unshare_file', filename=file, unshare_user=user)}">${user}</a>
+                            </tal:block>
+                    </li>
+                </ul>
+                <br>
+                <ul tal:condition="sharable_users">
+                    <li><i class="glyphicon glyphicon-user-add icon-muted"> Share With Others</i></li>
+                    ${form.begin(request.route_url('share_file', filename=file))}
+                        <fieldset>
+                            ${form.csrf_token()}
+                            ${form.errorlist('share_user')}
+                            ${form.select('share_user', sharable_users, sharable_users, multiple=True)}
+                            ${form.submit('form.submitted', 'Share', class_='submit')}
+                        </fieldset>
+                    ${form.end()}
                 </ul>
             </div>
         </div>
     </tal:block>
+        <div class='row'>
+            <div class="links">
+                <ul tal:condition="shared_files">
+                    <tal:block repeat="shared_file shared_files">
+                    <li><i class="glyphicon glyphicon-user-add icon-muted"> Share With You</i></li>
+                        <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('view_file', filename=shared_file)}">${shared_file}</a></li>
+                    </tal:block>
+                </ul>
+            </div>
+        </div>
     <br><br><br>
 </tal:block>
 </html>
