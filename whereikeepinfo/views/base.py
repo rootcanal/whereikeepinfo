@@ -5,5 +5,4 @@ class BaseView(object):
         self.request = request
         self.username = authenticated_userid(request)
         self.__dict__.update(request.matchdict)
-        self.__dict__.update(request.params)
         self.__dict__.update(request.registry.settings)
