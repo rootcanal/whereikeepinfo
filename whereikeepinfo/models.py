@@ -13,6 +13,12 @@ from pyramid.security import Everyone
 Base = declarative_base()
 
 
+shared_files_map = sa.Table('shared_files_map', Base.metadata,
+    sa.Column('user_id', sa.INTEGER, sa.ForeignKey('users.id')),
+    sa.Column('file_id', sa.INTEGER, sa.ForeignKey('files.id'))
+)
+
+
 class User(Base):
 
     __tablename__ = 'users'
@@ -24,6 +30,7 @@ class User(Base):
     verified_at = sa.Column(sa.INTEGER, nullable=True)
     sharable = sa.Column(sa.BOOLEAN, default=False, nullable=False)
     files = sa_orm.relationship('File', backref='user')
+    shared_files = sa_orm.relationship('File', secondary=shared_files_map, backref='shared_users')
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
 
