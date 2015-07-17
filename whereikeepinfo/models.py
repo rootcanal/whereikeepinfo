@@ -33,6 +33,8 @@ class User(Base):
     shared_files = sa_orm.relationship('File', secondary=shared_files_map, backref='shared_users')
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
+    public_key = sa.Column('public_key', sa.TEXT)
+    private_key = sa.Column('private_key', sa.TEXT)
 
     def _get_password(self):
         return self._password
