@@ -89,12 +89,32 @@ def pad(passphrase, bs=32, padder='x'):
     return passphrase + (bs - len(passphrase) % bs) * padder
 
 
-def keygen(user, passphrase):
+def keygen(name, email, passphrase):
     cipher = AES.new(pad(passphrase))
     with gpg_session() as gpg:
-        params = dict(name_real=user.name, name_email=user.email, passphrase=passphrase)
+        params = dict(name_real=name, name_email=email)
         input_data = gpg.gen_key_input(**params)
         key = gpg.gen_key(input_data)
         pub = base64.b64encode(gpg.export_keys(key.fingerprint))
         priv = base64.b64encode(cipher.encrypt(pad(gpg.export_keys(key.fingerprint, True))))
     return (pub, priv)
+
+
+def encrypt(f, key_or_keys):
+    if isinstance(key_or_keys, basestring):
+        key_or_keys = [key_or_keys]
+    keys = '\n'.join([base64.b64decode(k) for k in key_or_keys])
+    with gpg_session() as gpg:
+        imported_keys = gpg.import_keys(keys)
+        recipients = imported_keys.fingerprints
+        return str(gpg.encrypt_file(f, recipients, always_trust=True))
+
+
+def decrypt(data, private_key, public_key, passphrase, padder='x'):
+    cipher = AES.new(pad(passphrase))
+    with gpg_session() as gpg:
+        decrypted_key = cipher.decrypt(base64.b64decode(private_key))
+        unpadded_key = decrypted_key.rstrip(padder)
+        gpg.import_keys(unpadded_key)
+        gpg.import_keys(base64.b64decode(public_key))
+        return str(gpg.decrypt(data, always_trust=True))
