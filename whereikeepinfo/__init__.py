@@ -1,3 +1,5 @@
+import logging
+
 from pyramid.config import Configurator
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -10,14 +12,20 @@ from .models import RootFactory
 import views
 
 
+logger = logging.getLogger(__name__)
+
+
 def create_routes(config, routes):
     for name, route in routes:
+        logger.info('adding route: %s', name)
         config.add_route(name, route)
 
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    logging.basicConfig(level=logging.DEBUG)
+
     authn_policy = SessionAuthenticationPolicy()
     authz_policy = ACLAuthorizationPolicy()
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['session.secret'])
