@@ -71,7 +71,7 @@ def authenticate_user(form, dbmaker):
             username = form.data['username']
             password = form.data['password']
             with db_session(dbmaker) as session:
-                user = session.query(User).filter(User.username==username).one()
+                user = session.query(User).filter(User.username==username).first()
                 if user and bcrypt.verify(password, user.password):
                     return True
         return False
