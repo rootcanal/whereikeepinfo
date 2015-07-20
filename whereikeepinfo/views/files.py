@@ -150,15 +150,19 @@ class FilesView(BaseView):
                 u = session.query(User).filter(User.username==share_user).one()
                 f.shared_users.append(u)
                 session.add(f)
-                recipients = [user.public_key for user in f.shared_users]
+                recipients = [owner.public_key]
+                recipients += [user.public_key for user in f.shared_users]
                 with open(query_file, 'rb') as o:
                     data = o.read()
-                decrypted = utils.decrypt(data, u.private_key, u.public_key, passwd)
+                decrypted = utils.decrypt(data, owner.private_key, owner.public_key, passwd)
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(decrypted)
                     tmp.flush()
+                    tmp.seek(0)
                     encrypted = utils.encrypt(tmp, recipients)
-                name = utils.store_file(encrypted, self.filename, u.username, self.storage_dir)
+                tmp = tempfile.NamedTemporaryFile(dir=self.storage_dir)
+                tmp.write(encrypted)
+                os.rename(tmp.name, query_file)
             self.request.session.flash(
                 u'successfully shared file: %s with user %s' % (self.filename, share_user)
             )
