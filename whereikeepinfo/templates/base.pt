@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Philip Ramsey">
 
-    <title>Where I (Philip Ramsey) Keep Info</title>
+    <title>Where I Keep Info</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
@@ -29,8 +29,6 @@
     </div>
     <div class="starter-template">
       <div class="container">
-        <div metal:define-slot="content">
-        </div>
         <div class="row">
           <div class="links">
             <ul>
@@ -40,19 +38,15 @@
               <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('user', userid=username)}">Manage Account</a></li>
               <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('view_files')}">Uploaded Files</a></li>
               <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('home')}">Home Page</a></li>
+              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('about')}">About</a></li>
+              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/rootcanal/whereikeepinfo">Github Project</a></li>
             </ul>
           </div>
         </div>
+        <div metal:define-slot="content">
+        </div>
         <br><br><br>
         <div class="row">
-          <div class="links">
-            <ul>
-              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('about')}">About Me</a></li>
-              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('resume')}">Résumé</a></li>
-              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/rootcanal/whereikeepinfo">Github Project</a></li>
-              <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="irc://irc.freenode.net#tesc">Find me on IRC</a></li>
-            </ul>
-          </div>
           <div class="copyright">
             Copyright &copy; 2015 Philip Ramsey All Rights Reserved
           </div>

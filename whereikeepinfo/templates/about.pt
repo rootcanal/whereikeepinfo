@@ -24,5 +24,13 @@
                 </div>
             </div>
         </div>
+        <br><br>
+        <div class='row'>
+            <div class="links">
+                <ul>
+                    <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('resume')}">Résumé</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
