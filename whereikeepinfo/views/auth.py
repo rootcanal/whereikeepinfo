@@ -1,5 +1,6 @@
 import smtplib
 import time
+import logging
 
 from pyramid_simpleform.renderers import FormRenderer
 from pyramid_simpleform import Form
@@ -14,6 +15,9 @@ from whereikeepinfo.models import User
 from whereikeepinfo.views.base import BaseView
 from whereikeepinfo.views import utils
 from whereikeepinfo import forms
+
+
+logger = logging.getLogger(__name__)
 
 
 @view_defaults(route_name='auth')
@@ -82,7 +86,7 @@ class AuthView(BaseView):
             headers = remember(self.request, self.username)
             with utils.db_session(self.dbmaker) as session:
                 user = session.query(User).filter(User.email==email).first()
-                (pub, priv) = utils.keygen(user, form.data['password'])
+                (pub, priv) = utils.keygen(user.name, user.email, form.data['password'])
                 user.verified_at = time.time()
                 user.public_key = pub
                 user.private_key = priv

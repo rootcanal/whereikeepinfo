@@ -38,7 +38,7 @@
               <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('login')}">Login</a></li>
               <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('logout')}">Logout</a></li>
               <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('user', userid=username)}">Manage Account</a></li>
-              <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('files')}">Uploaded Files</a></li>
+              <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('view_files')}">Uploaded Files</a></li>
               <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('home')}">Home Page</a></li>
             </ul>
           </div>

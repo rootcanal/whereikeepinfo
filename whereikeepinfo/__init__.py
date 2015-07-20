@@ -46,7 +46,7 @@ def main(global_config, **settings):
     routes = [('resume', '/about/resume'),
               ('logout', '/logout'),
               ('home', '/'),
-              ('files', '/files'),
+              ('view_files', '/files'),
               ('view_file', '/files/view/{filename}'), 
               ('delete_file', '/files/delete/{filename}'), 
               ('share_file', '/files/share/{filename}'), 

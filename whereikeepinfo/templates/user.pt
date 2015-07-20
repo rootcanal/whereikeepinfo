@@ -24,7 +24,7 @@
         <div class='row'>
             <div class="links">
                 <ul>
-                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> uploaded files count: </i><a href="${request.route_url('files')}">${filecount}</a></li>
+                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> uploaded files count: </i><a href="${request.route_url('view_files')}">${filecount}</a></li>
                 </ul>
             </div>
         </div>
