@@ -111,7 +111,7 @@ def encrypt(f, key_or_keys):
     with gpg_session() as gpg:
         imported_keys = gpg.import_keys(keys)
         recipients = imported_keys.fingerprints
-        print recipients
+        logger.info('recipients: %s', recipients)
         return str(gpg.encrypt_file(f, recipients, always_trust=True))
 
 
