@@ -43,3 +43,7 @@ class LoginSchema(formencode.Schema):
 class UploadFileSchema(formencode.Schema):
     allow_extra_fields = True
     uploaded_file = FileValidator(upload_field='uploaded_file', max_upload_size=10485760)
+
+class PassphraseSchema(formencode.Schema):
+    allow_extra_fields = True
+    password = formencode.validators.String(not_empty=True)
