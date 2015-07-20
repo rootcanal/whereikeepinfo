@@ -52,3 +52,16 @@ class TestEncryption(unittest.TestCase):
         encrypted = utils.encrypt(self.file, pub)
         decrypted = utils.decrypt(encrypted, priv, pub, self.passphrase)
         self.assertEquals(decrypted, self.message)
+
+    def test_encrypt_with_multiple_recipients(self):
+        # create two keypairs
+        pub1, priv1 = utils.keygen(self.name, self.email, self.passphrase)
+        pub2, priv2 = utils.keygen(self.name, self.email, self.passphrase)
+        # encrypt file for both 
+        encrypted = utils.encrypt(self.file, [pub1, pub2])
+        # check keypair one can decrypt
+        decrypted = utils.decrypt(encrypted, priv1, pub1, self.passphrase)
+        self.assertEquals(decrypted, self.message)
+        # check keypair two can decrypt
+        decrypted = utils.decrypt(encrypted, priv2, pub2, self.passphrase)
+        self.assertEquals(decrypted, self.message)
