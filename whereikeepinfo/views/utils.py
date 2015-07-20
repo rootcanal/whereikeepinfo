@@ -3,6 +3,7 @@ import base64
 import shutil
 import tempfile
 import os
+import logging
 
 import gnupg
 from Crypto.Cipher import AES
@@ -12,6 +13,9 @@ from pyramid_simpleform import Form
 from pyramid.security import authenticated_userid
 
 from whereikeepinfo.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -26,18 +30,26 @@ def db_session(sessionmaker):
         session.commit()
     session.close()
 
+
 @contextmanager
-def gpg_session():
+def tmpdir():
     tmp = tempfile.mkdtemp()
     try:
-        gpg = gnupg.GPG(gnupghome=tmp)
-        yield gpg
+        yield tmp
     finally:
-        del gpg
         shutil.rmtree(tmp)
 
+@contextmanager
+def gpg_session():
+    with tmpdir() as tmp:
+        try:
+            gpg = gnupg.GPG(gnupghome=tmp)
+            yield gpg
+        finally:
+            del gpg
 
-def store_file(f, name, username, root_dir):
+
+def store_file(data, name, username, root_dir):
     userdir = os.path.join(root_dir, username)
     if not os.path.isdir(userdir):
         os.makedirs(userdir)
@@ -50,17 +62,9 @@ def store_file(f, name, username, root_dir):
                 name = new_name
                 break
     outf = os.path.join(userdir, name)
-    print 'writing file:',  outf
     with open(outf, 'wb') as o:
-        o.write(f.read())
+        o.write(data)
     return name
-
-
-def get_user_by_name(request, session):
-    userid = authenticated_userid(request)
-    print 'userid:', userid
-    if userid is not None:
-        return session.query(User).filter(User.username==userid).first()
 
 def authenticate_user(form, request, dbmaker):
         if form.validate():
@@ -107,6 +111,7 @@ def encrypt(f, key_or_keys):
     with gpg_session() as gpg:
         imported_keys = gpg.import_keys(keys)
         recipients = imported_keys.fingerprints
+        print recipients
         return str(gpg.encrypt_file(f, recipients, always_trust=True))
 
 
