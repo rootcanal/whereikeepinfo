@@ -80,7 +80,7 @@ class AuthView(BaseView):
             return HTTPFound(location=self.request.route_url('home'))
         form = Form(self.request, schema=forms.LoginSchema)
         if 'form.submitted' in self.request.POST:
-            if not utils.authenticate_user(form, self.request, self.dbmaker):
+            if not utils.authenticate_user(form, self.dbmaker):
                 self.request.session.flash(u'Failed to verify your account credentials')
                 return HTTPFound(location=self.request.route_url('home'))
             headers = remember(self.request, self.username)
@@ -132,7 +132,7 @@ class AuthView(BaseView):
         came_from = self.request.params.get('came_from', self.request.route_url('home'))
         form = Form(self.request, schema=forms.LoginSchema)
         if 'form.submitted' in self.request.POST:
-            if utils.authenticate_user(form, self.request, self.dbmaker):
+            if utils.authenticate_user(form, self.dbmaker):
                 headers = remember(self.request, form.data['username'])
                 self.request.session.flash(u'Logged in successfully.')
                 return HTTPFound(location=came_from, headers=headers)

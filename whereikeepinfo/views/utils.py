@@ -66,7 +66,7 @@ def store_file(data, name, username, root_dir):
         o.write(data)
     return name
 
-def authenticate_user(form, request, dbmaker):
+def authenticate_user(form, dbmaker):
         if form.validate():
             username = form.data['username']
             password = form.data['password']
