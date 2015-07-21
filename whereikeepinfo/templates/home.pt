@@ -20,7 +20,7 @@ whereikeep.info is a simple and secure file sharing application. We use Public K
   Once your account has been verified and your keypair has been generated, you will be able to upload files to the server. When uploading files, Your public key will be used by default to encrypt them for storage on the server. If at some later point in time you choose to share the file with another verified user, you will be prompted for your private key passphrase to decrypt the file, then it will be encrypted with yours and the public keys of any verified users you have shared it with.
 <br>
 <br>
- When you download a file that you have uploaded, or that has been shared with you by someone else, you will be prompted for your private key passphrase. The file will then be decrypted with your key and you will be able to download it.
+ To authorize others to share files with you, simply go into 'Manage Account' and click the 'toggle sharability' button to make your account sharable. By default, accounts are not sharable and must enable sharing manually. When you download a file that you have uploaded, or that has been shared with you by someone else, you will be prompted for your private key passphrase. The file will then be decrypted with your key and you will be able to download it.
                         </p>
                         <h2><span class="font-semi-bold">NOTE</span></h2>
                         <p class="lead">
