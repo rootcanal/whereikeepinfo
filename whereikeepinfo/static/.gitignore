@@ -4,3 +4,11 @@
 !.gitignore
 # and css bits
 !*.css
+# and js bits
+!*.js
+# and font bits
+!*.ttf
+!*.eot
+!*.svg
+!*.woff
+!*.woff2
