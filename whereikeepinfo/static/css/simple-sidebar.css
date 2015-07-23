@@ -31,7 +31,8 @@
 
 #page-content-wrapper {
     position: absolute;
-    margin-right: 150px;
+    margin-right: 50px;
+    margin-left: 50px;
 }
 
 /* Sidebar Styles */
