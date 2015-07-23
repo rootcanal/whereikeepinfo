@@ -36,7 +36,7 @@
                 </li>
                 <li tal:condition="username">
                     <a href="${request.route_url('user', userid=username)}">
-                        Signed in As ${username}
+                        signed in as ${username}
                     </a>
                 </li>
                 <li tal:condition="username">
