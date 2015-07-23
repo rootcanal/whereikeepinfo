@@ -74,6 +74,11 @@
                         Github Project
                     </a>
                 </li>
+                <li tal:condition="request.matched_route.name == 'about'">
+                    <a href="${request.route_url('resume')}">
+                        Resume
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->
