@@ -172,7 +172,7 @@ class FilesView(BaseView):
                     tmp.flush()
                     tmp.seek(0)
                     encrypted = utils.encrypt(tmp, recipients)
-                tmp = tempfile.NamedTemporaryFile(dir=self.storage_dir)
+                tmp = tempfile.NamedTemporaryFile(dir=self.storage_dir, delete=False)
                 tmp.write(encrypted)
                 os.rename(tmp.name, query_file)
             self.request.session.flash(
