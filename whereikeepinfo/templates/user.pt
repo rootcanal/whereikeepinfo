@@ -1,33 +1,22 @@
 <div metal:use-macro="load: base.pt">
     <tal:block metal:fill-slot="content">
-        <div class='row'>
-            <div class="links">
-                <h1>${name}</h1>
-                <ul>
-                    <li><i class="glyphicon glyphicon-barcode icon-muted"> username: </i><a>${username}</a></li>
-                    <li><i class="glyphicon glyphicon-envelope icon-muted"> email: </i><a>${email}</a></li>
-                    <li tal:condition="sharable"><i class="glyphicon glyphicon-thumbs-up icon-muted"> sharable</i><a></a></li>
-                    <li tal:condition="not sharable"><i class="glyphicon glyphicon-thumbs-down icon-muted"> not sharable</i><a></a></li>
-                    <li><a href="${request.route_url('toggle_sharability', userid=username)}">toggle sharability</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class='row'>
-            <div class="links">
-                <ul>
-                    <li><i class="glyphicon glyphicon-hand-up icon-muted"> account created at: </i><a>${created_at}</a></li>
-                    <li tal:condition="verified"><i class="glyphicon glyphicon-thumbs-up icon-muted"> account verified</i></li>
-                    <li tal:condition="not verified"><i class="glyphicon glyphicon-thumbs-down icon-muted"> account not verified</i><a href="${request.route_url('send_verify')}">Send Verification Email</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class='row'>
-            <div class="links">
-                <ul>
-                    <li><i class="glyphicon glyphicon-thumbs-up icon-muted"> uploaded files count: </i><a href="${request.route_url('view_files')}">${filecount}</a></li>
-                </ul>
-            </div>
-        </div>
-        <br><br><br>
+       <h1>Account Settings for ${name}</h1>
+       <dl class="dl-horizontal">
+            <dt>Username</dt>
+            <dd>${username}</dd>
+            <dt>Email</dt>
+            <dd>${email}</dd>
+            <dt>Sharability</dt>
+            <dd tal:condition="sharable">Currently Others are not able to share files with you</dd>
+            <dd tal:condition="not sharable">Currently Others are able to share files with you</dd>
+            <dd><a href="${request.route_url('toggle_sharability', userid=username)}">toggle sharability</a></dd>
+            <dt>Account Created At</dt>
+            <dd>${created_at}</dd>
+            <dt>Account Verification</dt>
+            <dd tal:condition="verified">Verified</dd>
+            <dd tal:condition="not verified">Not Verified<a href="${request.route_url('send_verify')}">Send Verification Email</a></dd>
+            <dt>Uploaded File Count</dt>
+            <dd>${filecount}</dd>
+       </dl>
     </tal:block>
 </div>
