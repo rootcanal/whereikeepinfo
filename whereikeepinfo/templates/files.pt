@@ -9,11 +9,8 @@
     </h2>
     <form action="/files" method="post" accept-charset="utf-8"
           enctype="multipart/form-data">
-    
-        <label for="uploaded_file">File</label>
-        <input id="uploaded_file" name="uploaded_file" type="file" value="" />
-    
-        <input type="submit" value="submit" />
+        <input class="col-sm-8 btn btn-primary" id="uploaded_file" name="uploaded_file" type="file" value="" />
+        <input class="btn btn-default" type="submit" value="submit" />
     </form>
     <h2>
         Files Uploaded
