@@ -1,10 +1,7 @@
 <div metal:use-macro="load: base.pt">
     <div metal:fill-slot="content">
         <div class="row">
-            <div class="col-md-2">
-            <img src="${request.static_url('whereikeepinfo:static/workinman.jpg')}" style="width:20em; height:20em;">
-            </div>
-            <div class="col-md-20">
+            <div class="col-md-12">
                 <div class="content">
                     <h1><span class="font-semi-bold">Welcome to Whereikeepinfo</span></h1>
 

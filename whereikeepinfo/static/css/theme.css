@@ -27,10 +27,10 @@ p {
   font-weight: 700;
 }
 .starter-template {
-  margin-top: 50px;
 }
 .starter-template .content {
-  margin-left: 25em;
+  margin-left: 15em;
+  margin-right: 15em;
 }
 .starter-template .content h1 {
   margin-top: 10px;
@@ -48,7 +48,8 @@ p {
   color: #ffffff;
 }
 .starter-template .links {
-  margin-left: 25em;
+  margin-left: 15em;
+  margin-right: 15em;
   float: center;
   right: 0;
   margin-top: 10px;
@@ -58,10 +59,17 @@ p {
   padding: 0;
   margin: 0;
 }
+.starter-template .links ul p {
+  color: #f2b7bd;
+}
+.starter-template .links ul p a{
+  color: #f2b7bd;
+}
 .starter-template .links ul li {
   list-style: none;
   display: inline;
   margin: 0 10px;
+  font-weight: 400;
 }
 .starter-template .links ul li:first-child {
   margin-left: 0;
@@ -87,12 +95,12 @@ p {
   color: #ffffff;
 }
 .starter-template .copyright {
-  margin-left: 28em;
   margin-top: 10px;
   font-size: 0.9em;
   color: #f2b7bd;
   text-transform: lowercase;
   float: center;
+  text-align: center;
   right: 0;
 }
 .starter-template .body {
@@ -108,6 +116,41 @@ p {
   color: #f2b7bd;
   text-decoration: underline;
 }
+#sidebar {
+  height: 100%;
+  width:0px;
+  
+padding-right: 0;
+  padding-top: 20px;
+}
+
+#sidebar .affix {
+  position:fixed;
+  top:55;
+  width:0px;
+}
+
+#sidebar .affix-bottom {
+  position:fixed;
+  top:55;
+  width:220px;
+}
+
+#sidebar .nav {
+  width: 95%;
+}
+#sidebar li {
+  border:0 #1e1e1e solid;
+  border-bottom-width:1px;
+}
+#sidebar li a {
+  padding-left:1px;
+}
+#sidebar li a:hover {
+  background-color:#222222;
+  color:#ffffff;
+}
+
 @media (max-width: 1199px) {
   .starter-template .content h1 {
     font-size: 45px;
@@ -136,7 +179,7 @@ p {
   .starter-template .links {
     float: none;
     text-align: center;
-    margin-top: 60px;
+    margin-top: 600px;
   }
   .starter-template .copyright {
     float: none;

@@ -9,10 +9,10 @@
     <title>Where I Keep Info</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${request.static_url('whereikeepinfo:static/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this scaffold -->
-    <link href="${request.static_url('whereikeepinfo:static/theme.css')}" rel="stylesheet">
+    <!-- http://startbootstrap.com/template-overviews/simple-sidebar/ -->
+    <link href="${request.static_url('whereikeepinfo:static/css/simple-sidebar.css')}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -21,43 +21,83 @@
     <![endif]-->
   </head>
 
-  <body>
-    <div id="message" tal:condition="request.session.peek_flash()">
-        <p tal:repeat="message request.session.pop_flash()">
-            ${message}
-        </p>
-    </div>
-    <div class="starter-template">
-      <div class="container">
-        <div class="row">
-          <div class="links">
-            <ul>
-              <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('register')}">Register</a></li>
-              <li tal:condition="not username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('login')}">Login</a></li>
-              <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('logout')}">Logout</a></li>
-              <li tal:condition="username"><i class="glyphicon glyphicon-cog icon-muted"></i><a href="${request.route_url('user', userid=username)}">Manage Account</a></li>
-              <li><i class="glyphicon glyphicon-paperclip icon-muted"></i><a href="${request.route_url('view_files')}">Uploaded Files</a></li>
-              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('home')}">Home Page</a></li>
-              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="${request.route_url('about')}">About</a></li>
-              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/rootcanal/whereikeepinfo">Github Project</a></li>
-            </ul>
-          </div>
-        </div>
-        <div metal:define-slot="content">
-        </div>
-        <br><br><br>
-        <div class="row">
-          <div class="copyright">
-            Copyright &copy; 2015 Philip Ramsey All Rights Reserved
-          </div>
-        </div>
-      </div>
-   </div>
+<body>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
-  </body>
+    <div id="wrapper" class="toggled">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li tal:condition="request.matched_route.name != 'home'" class="sidebar-brand">
+                    <a href="${request.route_url('home')}">
+                       Home Page 
+                    </a>
+                </li>
+                <li tal:condition="username">
+                    <a href="${request.route_url('user', userid=username)}">
+                        Signed in As ${username}
+                    </a>
+                </li>
+                <li tal:condition="username">
+                    <a href="${request.route_url('logout')}">
+                        Logout
+                    </a>
+                </li>
+                <li tal:condition="not username and request.matched_route.name != 'register'">
+                    <a href="${request.route_url('register')}">
+                        Register
+                    </a>
+                </li>
+                <li tal:condition="not username and request.matched_route.name != 'login'">
+                    <a href="${request.route_url('login')}">
+                        Login
+                    </a>
+                </li>
+                <li tal:condition="username and request.matched_route.name != 'user'">
+                    <a href="${request.route_url('user', userid=username)}">
+                        Manage Account
+                    </a>
+                </li>
+                <li tal:condition="username">
+                    <a href="${request.route_url('view_files')}">
+                        Uploaded Files
+                    </a>
+                </li>
+                <li tal:condition="request.matched_route.name != 'about'">
+                    <a href="${request.route_url('about')}">
+                        About
+                    </a>
+                </li>
+                <li>
+                    <a href="https://github.com/rootcanal/whereikeepinfo">
+                        Github Project
+                    </a>
+                </li>
+            </ul>
+            <div tal:condition="request.session.peek_flash()" tal:repeat="message request.session.pop_flash()" class="alert alert-info" role="alert">${message}</div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div metal:define-slot="content">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
 </html>
