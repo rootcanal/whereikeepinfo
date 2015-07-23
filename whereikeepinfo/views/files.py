@@ -70,11 +70,17 @@ class FilesView(BaseView):
             username = user.username
             owned_files = dict()
             for f in user.files:
-                owned_files[f.name] = [u.username for u in f.shared_users]
+                shared_with = [u.username for u in f.shared_users]
+                owned_file = dict(shared=shared_with, uploaded_at=f.uploaded_at, size=f.size)
+                owned_files[f.name] = owned_file
             sharable_users = session.query(User).filter(User.sharable==True)
             sharable_users = sharable_users.filter(User.username!=self.username).all()
             sharable_users = [u.username for u in sharable_users]
-            shared_files = [f.name for f in user.shared_files]
+            shared_files = dict()
+            for f in user.shared_files:
+                owner = session.query(User).filter(User.id==f.user_id).first()
+                shared_file = dict(size=f.size, owner=owner.username)
+                shared_files[f.name] = shared_file
 
         return dict(
             current_upload_size=current_upload_size,
@@ -150,8 +156,11 @@ class FilesView(BaseView):
             with utils.db_session(self.dbmaker) as session:
                 owner = session.query(User).filter(User.username==self.username).one()
                 f = session.query(File).filter(File.name==self.filename).one()
-                u = session.query(User).filter(User.username==share_user).one()
-                f.shared_users.append(u)
+                u = session.query(User).filter(User.username==share_user).first()
+                if u is None:
+                    del f.shared_users[:]
+                else:
+                    f.shared_users.append(u)
                 session.add(f)
                 recipients = [owner.public_key]
                 recipients += [user.public_key for user in f.shared_users]
@@ -175,7 +184,6 @@ class FilesView(BaseView):
             sharable_users = sharable_users.filter(User.username!=self.username).all()
             sharable_users = [u.username for u in sharable_users]
         return dict(
-            form=FormRenderer(form),
             username=self.username,
             filename=self.filename,
             sharable_users=sharable_users
