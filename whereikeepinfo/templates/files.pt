@@ -28,7 +28,9 @@
             <tbody>
                 <tr>
                     <td>
-                        ${file}
+                        <a href="${request.route_url('manage_file', filename=file)}">
+                            ${file}
+                        </a>
                     </td>
                     <td>
                         ${uploaded_files[file]['size']}
@@ -36,22 +38,15 @@
                     <td>
                         ${uploaded_files[file]['uploaded_at']}
                     </td>
-                    <td>
+                    <td tal:condition="uploaded_files[file]['shared']">
                         ${', '.join(uploaded_files[file]['shared'])}
                     </td>
-                    <td>
-                        <a href="${request.route_url('view_file', filename=file)}">
-                            View
-                        </a>
+                    <td tal:condition="not uploaded_files[file]['shared']">
+                        None
                     </td>
                     <td>
                         <a href="${request.route_url('delete_file', filename=file)}">
                             Delete
-                        </a>
-                    </td>
-                    <td>
-                        <a href="${request.route_url('share_file', filename=file)}">
-                            Change Share Settings
                         </a>
                     </td>
                 </tr>

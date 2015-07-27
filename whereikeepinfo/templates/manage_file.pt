@@ -1,0 +1,48 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="load: base.pt">
+
+<div metal:fill-slot="content">
+    <h1>
+        whereikeep ${filename}
+    </h1>
+    <dl class="dl-horizontal">
+        <dt>Filename</dt>
+        <dd>${filename}</dd>
+        <dt>Size</dt>
+        <dd>${size}</dd>
+        <dt>Uploaded At</dt>
+        <dd>${uploaded_at}</dd>
+        <dt>Sharing with</dt>
+        <dd>${shared_with}</dd>
+    </dl>
+    <h2>
+        File Sharing Settings For ${filename}
+    </h2>
+    <form class="form-horizontal" method="POST" action="${request.route_url('share_file', filename=filename)}">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <select name="share_user" class="form-control">
+                    <option>Share With Nobody</option>
+                    <tal:block repeat="user sharable_users">
+                        <option>${user}</option>
+                    </tal:block>
+                </select>
+            </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Password</label>
+                <div class="col-sm-10">
+                    <input name="password" type="password" class="form-control" placeholder="Password">
+                </div>
+        </div>
+        <div class="form-actions">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button name='form.submitted' type="submit" class="btn btn-default">
+                    Update Share Settings
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+</html>

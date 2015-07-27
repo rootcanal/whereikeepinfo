@@ -92,6 +92,35 @@ class FilesView(BaseView):
         )
 
 
+    @view_config(route_name="manage_file", renderer='whereikeepinfo:templates/manage_file.pt')
+    def manage_file(self):
+        if self.username is None:
+            self.request.session.flash(u'You must be logged in to keep files.')
+            return HTTPFound(location=self.request.route_url('login'))
+
+        with utils.db_session(self.dbmaker) as session:
+            user = session.query(User).filter(User.username==self.username).first()
+            f = session.query(File).filter(File.name==self.filename).first()
+            username = user.username
+            size = f.size
+            uploaded_at = f.uploaded_at
+
+            sharable_users = session.query(User).filter(User.sharable==True)
+            sharable_users = sharable_users.filter(User.username!=self.username).all()
+            sharable_users = [u.username for u in sharable_users]
+
+            shared_with = ', '.join([u.username for u in f.shared_users])
+
+        return dict(
+            username=username,
+            filename=self.filename,
+            uploaded_at=uploaded_at,
+            size=size,
+            sharable_users=sharable_users,
+            shared_with=shared_with
+        )
+
+
     @view_config(route_name='view_file', renderer='whereikeepinfo:templates/view_file.pt')
     def view_file(self):
         form = Form(self.request, schema=forms.PassphraseSchema)

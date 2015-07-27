@@ -48,6 +48,7 @@ def main(global_config, **settings):
               ('home', '/'),
               ('view_files', '/files'),
               ('view_file', '/files/view/{filename}'), 
+              ('manage_file', '/files/manage/{filename}'), 
               ('delete_file', '/files/delete/{filename}'), 
               ('share_file', '/files/share/{filename}'), 
               ('unshare_file', '/files/unshare/{filename}/{unshare_user}'), 
