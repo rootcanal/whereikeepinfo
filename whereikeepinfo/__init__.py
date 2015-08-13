@@ -8,7 +8,6 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm import sessionmaker
 
-from .models import RootFactory
 import views
 
 
@@ -30,7 +29,6 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['session.secret'])
     config = Configurator(settings=settings,
-                          root_factory=RootFactory,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy,
                           session_factory=session_factory

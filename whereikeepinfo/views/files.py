@@ -26,14 +26,13 @@ logger = logging.getLogger(__name__)
 @view_defaults(route_name='view_files', renderer='whereikeepinfo:templates/files.pt')
 class FilesView(BaseView):
 
+    def __init__(self, request):
+        super(FilesView, self).__init__(request)
+        self.require_login(came_from='view_files')
+
     @view_config(request_method='POST')
     def upload_file(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
-
         form = Form(self.request, schema=forms.UploadFileSchema)
-
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             if user.verified_at is None:
@@ -55,12 +54,7 @@ class FilesView(BaseView):
 
     @view_config(request_method='GET')
     def view_files(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
-
         form = Form(self.request, schema=forms.UploadFileSchema)
-
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             if user.verified_at is None:
@@ -94,10 +88,6 @@ class FilesView(BaseView):
 
     @view_config(route_name="manage_file", renderer='whereikeepinfo:templates/manage_file.pt')
     def manage_file(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
-
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             f = session.query(File).filter(File.name==self.filename).first()
@@ -161,9 +151,6 @@ class FilesView(BaseView):
 
     @view_config(route_name='delete_file')
     def delete_file(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to delete files.')
-            return HTTPFound(location=self.request.route_url('login'))
         query_file = os.path.join(self.storage_dir, self.username, self.filename)
         with utils.db_session(self.dbmaker) as session:
             f = session.query(File).filter(File.name==self.filename).first()
@@ -174,9 +161,6 @@ class FilesView(BaseView):
 
     @view_config(route_name='share_file', renderer='whereikeepinfo:templates/share_file.pt')
     def share_file(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to keep files.')
-            return HTTPFound(location=self.request.route_url('login'))
         form = Form(self.request, schema=forms.PassphraseSchema)
         if 'form.submitted' in self.request.POST and form.validate():
             passwd = form.data['password']
@@ -220,9 +204,6 @@ class FilesView(BaseView):
 
     @view_config(route_name='unshare_file')
     def unshare_file(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to share files.')
-            return HTTPFound(location=self.request.route_url('login'))
         query_file = os.path.join(self.storage_dir, self.username, self.filename)
         with utils.db_session(self.dbmaker) as session:
             f = session.query(File).filter(File.name==self.filename).first()

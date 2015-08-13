@@ -25,9 +25,7 @@ class AuthView(BaseView):
 
     @view_config(route_name='send_verify')
     def send_verify(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to edit your account.')
-            return HTTPFound(location=self.request.route_url('login', came_from='send_verify'))
+        self.require_login()
         with utils.db_session(self.dbmaker) as session:
             email = session.query(User.email).filter(User.username==self.username).first()
         serializer = URLSafeTimedSerializer(self.verification_key)
@@ -101,9 +99,7 @@ class AuthView(BaseView):
 
     @view_config(route_name='user', renderer='whereikeepinfo:templates/user.pt')
     def user(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to view your account.')
-            return HTTPFound(location=self.request.route_url('login', came_from='user'))
+        self.require_login()
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             return dict(
@@ -118,9 +114,7 @@ class AuthView(BaseView):
 
     @view_config(route_name='toggle_sharability')
     def toggle_sharability(self):
-        if self.username is None:
-            self.request.session.flash(u'You must be logged in to edit your account.')
-            return HTTPFound(location=self.request.route_url('login', came_from='toggle_sharability'))
+        self.require_login()
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             user.sharable = not user.sharable

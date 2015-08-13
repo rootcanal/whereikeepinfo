@@ -67,11 +67,3 @@ class File(Base):
         self.uploaded_at = time.time()
 
 
-class RootFactory(object):
-    __acl__ = [
-        (Allow, Everyone, 'view'),
-        (Allow, Authenticated, 'post')
-    ]
-
-    def __init__(self, request):
-        pass  # pragma: no cover
