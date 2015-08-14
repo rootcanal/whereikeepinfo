@@ -1,7 +1,6 @@
 import unittest
 import base64
 import tempfile
-from Crypto.Cipher import AES
 
 from whereikeepinfo.views import utils
 
@@ -21,11 +20,6 @@ class TestEncryption(unittest.TestCase):
     def tearDown(self):
         self.file.close()
 
-    def test_padding_pads(self):
-        padded = utils.pad(self.passphrase)
-        self.assertTrue(len(self.passphrase) % 16 != 0)
-        self.assertTrue(len(padded) % 16 == 0)
-
     def test_keygen_creates_valid_pub(self):
         pub, _ = utils.keygen(self.name, self.email, self.passphrase)
         pub = base64.b64decode(pub)
@@ -34,10 +28,7 @@ class TestEncryption(unittest.TestCase):
 
     def test_keygen_creates_valid_priv(self):
         _, priv = utils.keygen(self.name, self.email, self.passphrase)
-        cipher = AES.new(utils.pad(self.passphrase))
         priv = base64.b64decode(priv)
-        priv = cipher.decrypt(priv)
-        priv = priv.rstrip('x')
         self.assertTrue(priv.startswith('-----BEGIN PGP PRIVATE KEY BLOCK-----'))
         self.assertTrue(priv.endswith('-----END PGP PRIVATE KEY BLOCK-----\n'))
 

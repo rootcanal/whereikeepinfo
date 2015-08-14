@@ -6,7 +6,6 @@ import os
 import logging
 
 import gnupg
-from Crypto.Cipher import AES
 from passlib.hash import bcrypt
 from itsdangerous import URLSafeTimedSerializer
 from pyramid_simpleform import Form
@@ -89,18 +88,13 @@ def verify_email(token, key, salt, max_age=3600):
     return email
 
 
-def pad(passphrase, bs=32, padder='x'):
-    return passphrase + (bs - len(passphrase) % bs) * padder
-
-
 def keygen(name, email, passphrase):
-    cipher = AES.new(pad(passphrase))
     with gpg_session() as gpg:
-        params = dict(name_real=name, name_email=email)
+        params = dict(name_real=name, name_email=email, passphrase=passphrase)
         input_data = gpg.gen_key_input(**params)
         key = gpg.gen_key(input_data)
         pub = base64.b64encode(gpg.export_keys(key.fingerprint))
-        priv = base64.b64encode(cipher.encrypt(pad(gpg.export_keys(key.fingerprint, True))))
+        priv = base64.b64encode(gpg.export_keys(key.fingerprint, True))
     return (pub, priv)
 
 
@@ -115,11 +109,9 @@ def encrypt(f, key_or_keys):
         return str(gpg.encrypt_file(f, recipients, always_trust=True))
 
 
-def decrypt(data, private_key, public_key, passphrase, padder='x'):
-    cipher = AES.new(pad(passphrase))
+def decrypt(data, private_key, public_key, passphrase):
     with gpg_session() as gpg:
-        decrypted_key = cipher.decrypt(base64.b64decode(private_key))
-        unpadded_key = decrypted_key.rstrip(padder)
-        gpg.import_keys(unpadded_key)
+        decoded_key = base64.b64decode(private_key)
+        gpg.import_keys(decoded_key)
         gpg.import_keys(base64.b64decode(public_key))
-        return str(gpg.decrypt(data, always_trust=True))
+        return str(gpg.decrypt(data, passphrase=passphrase, always_trust=True))
