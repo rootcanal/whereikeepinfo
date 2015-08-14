@@ -29,7 +29,6 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['session.secret'])
     config = Configurator(settings=settings,
-                          root_factory=RootFactory,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy,
                           session_factory=session_factory
@@ -57,7 +56,10 @@ def main(global_config, **settings):
               ('verify', '/verify/{token}'),
               ('send_verify', '/verify'),
               ('login', '/login'),
-              ('about', '/about')
+              ('about', '/about'),
+              ('keys', '/keys'),
+              ('export_key', '/keys/export/{key}'),
+              ('delete_key', '/keys/delete/{key}'),
              ]
 
     create_routes(config, routes)

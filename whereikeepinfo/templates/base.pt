@@ -59,9 +59,14 @@
                         Manage Account
                     </a>
                 </li>
-                <li tal:condition="username">
+                <li tal:condition="username and request.matched_route.name != 'view_files'">
                     <a href="${request.route_url('view_files')}">
-                        Uploaded Files
+                        Manage Files
+                    </a>
+                </li>
+                <li tal:condition="username and request.matched_route.name != 'keys'">
+                    <a href="${request.route_url('keys')}">
+                        Manage Keys
                     </a>
                 </li>
                 <li tal:condition="request.matched_route.name != 'about'">

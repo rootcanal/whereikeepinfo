@@ -4,13 +4,13 @@
       metal:use-macro="load: base.pt">
 
 <div metal:fill-slot="content">
-    <h1>Please Provide the passphrase to view the file</h1>
-    ${form.begin(request.route_url('view_file', filename=filename))}
+    <h1>Please Provide your passphrase to export this key</h1>
+    ${form.begin(request.route_url('export_key', key=key))}
         <fieldset>
             ${form.errorlist('passphrase')}
             ${form.label('passphrase', 'Passphrase:')}
             ${form.password('passphrase')}
-            ${form.submit('form.submitted', 'view eeeet', class_='name')}
+            ${form.submit('form.submitted', 'export eeeet', class_='name')}
         </fieldset>
     ${form.end()}
 </div>

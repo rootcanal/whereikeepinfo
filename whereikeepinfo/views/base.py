@@ -1,6 +1,9 @@
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
 
+from whereikeepinfo.models import User
+import utils
+
 
 class BaseView(object):
     def __init__(self, request):
@@ -15,12 +18,20 @@ class BaseView(object):
             raise HTTPFound(location=self.request.route_url('login', came_from=came_from))
 
     def require_verification(self, errmsg=u'Account must be verified to do that'):
-        self.require_logion()
+        self.require_login()
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             if user.verified_at is None:
                 self.request.session.flash(errmsg)
                 raise HTTPFound(location=self.request.route_url('user', userid=self.username))
+
+    def require_key(self, errmsg=u'you must first create a key to do that'):
+        self.require_verification()
+        with utils.db_session(self.dbmaker) as session:
+            user = session.query(User).filter(User.username==self.username).first()
+            if not user.keys:
+                self.request.session.flash(errmsg)
+                raise HTTPFound(location=self.request.route_url('keys'))
 
 
 class LoggedInView(BaseView):

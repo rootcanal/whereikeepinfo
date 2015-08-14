@@ -16,7 +16,7 @@ import utils
 from whereikeepinfo import forms
 from whereikeepinfo.models import File
 from whereikeepinfo.models import User
-from whereikeepinfo.views.base import BaseView
+from whereikeepinfo.views.base import LoggedInView
 from whereikeepinfo.views import utils
 
 
@@ -28,7 +28,7 @@ class FilesView(LoggedInView):
 
     @view_config(request_method='POST')
     def upload_file(self):
-        self.require_verification()
+        self.require_key()
         form = Form(self.request, schema=forms.UploadFileSchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
@@ -38,9 +38,15 @@ class FilesView(LoggedInView):
                 name = f['filename']
                 size = f['size']
                 self.request.session.flash(u'successfully uploaded file %s.' % (name, ))
-                encrypted = utils.encrypt(f['file'], user.public_key)
+                pubs = []
+                for key in user.keys:
+                    pubs.append(key.public_key)
+                encrypted = utils.encrypt(f['file'], pubs)
                 name = utils.store_file(encrypted, name, user.username, self.storage_dir)
                 fileobj = File(name, size, user.id)
+                fileobj.owner = user
+                for key in user.keys:
+                    fileobj.keys.append(key)
                 user.files.append(fileobj)
                 session.add(user)
 
@@ -55,18 +61,15 @@ class FilesView(LoggedInView):
             current_upload_size = sum([f.size for f in user.files])
             username = user.username
             owned_files = dict()
+            shared_files = dict()
             for f in user.files:
-                shared_with = [u.username for u in f.shared_users]
+                shared_with = [k.user.username for k in f.keys]
                 owned_file = dict(shared=shared_with, uploaded_at=f.uploaded_at, size=f.size)
                 owned_files[f.name] = owned_file
+                shared_files[f.name] = dict(size=f.size, owner=f.owner.username)
             sharable_users = session.query(User).filter(User.sharable==True)
             sharable_users = sharable_users.filter(User.username!=self.username).all()
             sharable_users = [u.username for u in sharable_users]
-            shared_files = dict()
-            for f in user.shared_files:
-                owner = session.query(User).filter(User.id==f.user_id).first()
-                shared_file = dict(size=f.size, owner=owner.username)
-                shared_files[f.name] = shared_file
 
         return dict(
             current_upload_size=current_upload_size,
@@ -91,7 +94,7 @@ class FilesView(LoggedInView):
             sharable_users = sharable_users.filter(User.username!=self.username).all()
             sharable_users = [u.username for u in sharable_users]
 
-            shared_with = ', '.join([u.username for u in f.shared_users])
+            shared_with = ', '.join([k.user.username for k in f.keys])
 
         return dict(
             username=username,
@@ -109,20 +112,24 @@ class FilesView(LoggedInView):
         if 'form.submitted' in self.request.POST and form.validate():
             with utils.db_session(self.dbmaker) as session:
                 user = session.query(User).filter(User.username==self.username).first()
-                priv = user.private_key
-                pub = user.public_key
                 f = session.query(File).filter(File.name==self.filename).first()
-                owner = session.query(User).filter(User.id==f.user_id).first().username
-                if f not in user.shared_files and owner != user.username:
+                proper_key = [k for k in f.keys if k.user.username == user.username]
+                logger.info('owner: %s files: %s keys: %s', f.owner, user.files, f.keys)
+                if f.owner != user.username and len(proper_key) == 0:
                     self.request.session.flash(u'File not shared with you. are you a bad actor?')
                     return HTTPFound(location=self.request.route_url('home'))
-            query_file = os.path.join(self.storage_dir, owner, self.filename)
+                privs = []
+                pubs = []
+                for k in proper_key:
+                    privs.append(k.private_key)
+                    pubs.append(k.public_key)
+                query_file = os.path.join(self.storage_dir, f.owner.username, self.filename)
             if not os.path.isfile(query_file):
                 return HTTPNotFound("file %s is not a thinger" % (self.filename, ))
             content_type, encoding = mimetypes.guess_type(query_file)
             with open(query_file, 'rb') as o:
                 encrypted = o.read()
-                decrypted = utils.decrypt(encrypted, priv, pub, form.data['password']) 
+                decrypted = utils.decrypt(encrypted, privs, pubs, form.data['passphrase']) 
             with utils.tmpdir() as tmpd:
                 tmp = os.path.join(tmpd, self.filename)
                 with open(tmp, 'wb') as tmpf:
@@ -155,7 +162,7 @@ class FilesView(LoggedInView):
     def share_file(self):
         form = Form(self.request, schema=forms.PassphraseSchema)
         if 'form.submitted' in self.request.POST and form.validate():
-            passwd = form.data['password']
+            passphrase = form.data['passphrase']
             query_file = os.path.join(self.storage_dir, self.username, self.filename)
             share_user = self.request.params['share_user']
             with utils.db_session(self.dbmaker) as session:
@@ -165,13 +172,15 @@ class FilesView(LoggedInView):
                 if u is None:
                     del f.shared_users[:]
                 else:
-                    f.shared_users.append(u)
+                    for key in u.keys:
+                        f.keys.append(key)
                 session.add(f)
-                recipients = [owner.public_key]
-                recipients += [user.public_key for user in f.shared_users]
+                owner_pubs = [k.public_key for k in owner.keys]
+                owner_privs = [k.private_key for k in owner.keys]
+                recipients = owner_pubs + [k.public_key for k in f.keys]
                 with open(query_file, 'rb') as o:
                     data = o.read()
-                decrypted = utils.decrypt(data, owner.private_key, owner.public_key, passwd)
+                decrypted = utils.decrypt(data, owner_privs, owner_pubs, passwd)
                 with tempfile.NamedTemporaryFile() as tmp:
                     tmp.write(decrypted)
                     tmp.flush()
@@ -200,7 +209,9 @@ class FilesView(LoggedInView):
         with utils.db_session(self.dbmaker) as session:
             f = session.query(File).filter(File.name==self.filename).first()
             u = session.query(User).filter(User.username==self.unshare_user).first()
-            f.shared_users.remove(u)
+            for key in u.keys:
+                if key in f.keys:
+                    f.keys.remove(key)
             session.add(f)
         self.request.session.flash(
             u'no longer sharing file: %s with user: %s' % (self.filename, self.unshare_user)

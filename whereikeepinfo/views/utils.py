@@ -111,10 +111,15 @@ def encrypt(f, key_or_keys):
         return str(gpg.encrypt_file(f, recipients, always_trust=True))
 
 
-def decrypt(data, private_key, public_key, passphrase):
+def decrypt(data, private_keys, public_keys, passphrase):
+    if isinstance(private_keys, basestring):
+        private_keys = [private_keys]
+    if isinstance(public_keys, basestring):
+        public_keys = [public_keys]
     with gpg_session() as gpg:
-        decoded_key = base64.b64decode(private_key)
-        decrypted_key = gpg.decrypt(decoded_key, passphrase=passphrase)
-        gpg.import_keys(str(decrypted_key))
-        gpg.import_keys(base64.b64decode(public_key))
+        dec_priv = []
+        for k in private_keys:
+            dec_priv.append(gpg.decrypt(base64.b64decode(k), passphrase=passphrase))
+        gpg.import_keys('\n'.join([str(k) for k in dec_priv if str(k)]))
+        gpg.import_keys('\n'.join([base64.b64decode(k) for k in public_keys]))
         return str(gpg.decrypt(data, passphrase=passphrase, always_trust=True))

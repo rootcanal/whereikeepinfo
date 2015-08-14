@@ -45,6 +45,11 @@
                         None
                     </td>
                     <td>
+                        <a href="${request.route_url('view_file', filename=file)}">
+                            View
+                        </a>
+                    </td>
+                    <td>
                         <a href="${request.route_url('delete_file', filename=file)}">
                             Delete
                         </a>

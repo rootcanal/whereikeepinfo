@@ -46,4 +46,9 @@ class UploadFileSchema(formencode.Schema):
 
 class PassphraseSchema(formencode.Schema):
     allow_extra_fields = True
-    password = formencode.validators.String(not_empty=True)
+    passphrase = formencode.validators.String(not_empty=True)
+
+class GenKeySchema(formencode.Schema):
+    allow_extra_fields = True
+    keyname = formencode.validators.PlainText(not_empty=True)
+    passphrase = formencode.validators.String(not_empty=True, min=8)

@@ -13,8 +13,8 @@ from pyramid.security import Everyone
 Base = declarative_base()
 
 
-shared_files_map = sa.Table('shared_files_map', Base.metadata,
-    sa.Column('user_id', sa.INTEGER, sa.ForeignKey('users.id')),
+keys_files_map = sa.Table('keys_files_map', Base.metadata,
+    sa.Column('key_id', sa.INTEGER, sa.ForeignKey('keys.id')),
     sa.Column('file_id', sa.INTEGER, sa.ForeignKey('files.id'))
 )
 
@@ -29,12 +29,10 @@ class User(Base):
     email = sa.Column(sa.TEXT, unique=True, nullable=False)
     verified_at = sa.Column(sa.INTEGER, nullable=True)
     sharable = sa.Column(sa.BOOLEAN, default=False, nullable=False)
-    files = sa_orm.relationship('File', backref='user')
-    shared_files = sa_orm.relationship('File', secondary=shared_files_map, backref='shared_users')
+    files = sa_orm.relationship('File', backref='owner')
+    keys = sa_orm.relationship('Key', backref='user')
 
     _password = sa.Column('password', sa.TEXT, nullable=False)
-    public_key = sa.Column('public_key', sa.TEXT)
-    private_key = sa.Column('private_key', sa.TEXT)
 
     def _get_password(self):
         return self._password
@@ -59,6 +57,7 @@ class File(Base):
     name = sa.Column(sa.TEXT, unique=True)
     size = sa.Column(sa.INTEGER, nullable=False)
     user_id = sa.Column(sa.INTEGER, sa.ForeignKey('users.id'))
+    keys = sa_orm.relationship('Key', secondary=keys_files_map, backref='files')
 
     def __init__(self, name, size, user_id):
         self.name = name
@@ -67,3 +66,18 @@ class File(Base):
         self.uploaded_at = time.time()
 
 
+class Key(Base):
+    __tablename__ = 'keys'
+    id = sa.Column(sa.INTEGER, primary_key=True)
+    name = sa.Column(sa.TEXT, nullable=False)
+    created_at = sa.Column(sa.INTEGER)
+    public_key = sa.Column('public_key', sa.TEXT)
+    private_key = sa.Column('private_key', sa.TEXT)
+    user_id = sa.Column(sa.INTEGER, sa.ForeignKey('users.id'))
+
+    def __init__(self, name, userid, pub, priv):
+        self.name = name
+        self.user_id = userid
+        self.public_key = pub
+        self.private_key = priv
+        self.created_at = time.time()

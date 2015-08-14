@@ -86,11 +86,9 @@ class AuthView(BaseView):
                 user = session.query(User).filter(User.email==email).first()
                 (pub, priv) = utils.keygen(user.name, user.email, form.data['password'])
                 user.verified_at = time.time()
-                user.public_key = pub
-                user.private_key = priv
                 session.add(user)
                 self.request.session.flash(u'Account verified!')
-                return HTTPFound(location=self.request.route_url('home'))
+                return HTTPFound(location=self.request.route_url('keys'))
         return dict(
             form=FormRenderer(form),
             username=self.username,
