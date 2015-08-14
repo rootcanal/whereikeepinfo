@@ -14,6 +14,14 @@ class BaseView(object):
             self.request.session.flash(errmsg)
             raise HTTPFound(location=self.request.route_url('login', came_from=came_from))
 
+    def require_verification(self, errmsg=u'Account must be verified to do that'):
+        self.require_logion()
+        with utils.db_session(self.dbmaker) as session:
+            user = session.query(User).filter(User.username==self.username).first()
+            if user.verified_at is None:
+                self.request.session.flash(errmsg)
+                raise HTTPFound(location=self.request.route_url('user', userid=self.username))
+
 
 class LoggedInView(BaseView):
     def __init__(self, request):

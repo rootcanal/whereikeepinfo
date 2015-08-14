@@ -28,12 +28,10 @@ class FilesView(LoggedInView):
 
     @view_config(request_method='POST')
     def upload_file(self):
+        self.require_verification()
         form = Form(self.request, schema=forms.UploadFileSchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
-            if user.verified_at is None:
-                self.request.session.flash(u'Account must be verified to keep files.')
-                return HTTPFound(location=self.request.route_url('user', userid=self.username))
 
             if 'uploaded_file' in self.request.POST and form.validate():
                 f = form.data['uploaded_file']
@@ -50,12 +48,10 @@ class FilesView(LoggedInView):
 
     @view_config(request_method='GET')
     def view_files(self):
+        self.require_verification()
         form = Form(self.request, schema=forms.UploadFileSchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
-            if user.verified_at is None:
-                self.request.session.flash(u'Account must be verified to keep files.')
-                return HTTPFound(location=self.request.route_url('user', userid=self.username))
             current_upload_size = sum([f.size for f in user.files])
             username = user.username
             owned_files = dict()
