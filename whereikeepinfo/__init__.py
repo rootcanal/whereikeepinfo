@@ -29,6 +29,7 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     session_factory = UnencryptedCookieSessionFactoryConfig(settings['session.secret'])
     config = Configurator(settings=settings,
+                          root_factory=RootFactory,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy,
                           session_factory=session_factory
