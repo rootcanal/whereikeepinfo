@@ -94,7 +94,9 @@ def keygen(name, email, passphrase):
         input_data = gpg.gen_key_input(**params)
         key = gpg.gen_key(input_data)
         pub = base64.b64encode(gpg.export_keys(key.fingerprint))
-        priv = base64.b64encode(gpg.export_keys(key.fingerprint, True))
+        priv = gpg.export_keys(key.fingerprint, True)
+        priv = gpg.encrypt(priv, key.fingerprint, symmetric=True, passphrase=passphrase)
+        priv = base64.b64encode(str(priv))
     return (pub, priv)
 
 
@@ -112,6 +114,7 @@ def encrypt(f, key_or_keys):
 def decrypt(data, private_key, public_key, passphrase):
     with gpg_session() as gpg:
         decoded_key = base64.b64decode(private_key)
-        gpg.import_keys(decoded_key)
+        decrypted_key = gpg.decrypt(decoded_key, passphrase=passphrase)
+        gpg.import_keys(str(decrypted_key))
         gpg.import_keys(base64.b64decode(public_key))
         return str(gpg.decrypt(data, passphrase=passphrase, always_trust=True))

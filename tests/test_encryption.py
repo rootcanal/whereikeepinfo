@@ -27,8 +27,12 @@ class TestEncryption(unittest.TestCase):
         self.assertTrue(pub.endswith('-----END PGP PUBLIC KEY BLOCK-----\n'))
 
     def test_keygen_creates_valid_priv(self):
-        _, priv = utils.keygen(self.name, self.email, self.passphrase)
+        pub, priv = utils.keygen(self.name, self.email, self.passphrase)
         priv = base64.b64decode(priv)
+        pub = base64.b64decode(pub)
+        self.assertTrue(priv.startswith('-----BEGIN PGP MESSAGE-----'))
+        self.assertTrue(priv.endswith('-----END PGP MESSAGE-----\n'))
+        priv = utils.decrypt(priv, pub, pub, passphrase=self.passphrase)
         self.assertTrue(priv.startswith('-----BEGIN PGP PRIVATE KEY BLOCK-----'))
         self.assertTrue(priv.endswith('-----END PGP PRIVATE KEY BLOCK-----\n'))
 
