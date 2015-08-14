@@ -14,8 +14,8 @@ class BaseView(object):
             self.request.session.flash(errmsg)
             raise HTTPFound(location=self.request.route_url('login', came_from=came_from))
 
-class LoggedInView(BaseView):
 
+class LoggedInView(BaseView):
     def __init__(self, request):
         super(LoggedInView, self).__init__(request)
         self.require_login()
