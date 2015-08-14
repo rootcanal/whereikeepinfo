@@ -24,11 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @view_defaults(route_name='view_files', renderer='whereikeepinfo:templates/files.pt')
-class FilesView(BaseView):
-
-    def __init__(self, request):
-        super(FilesView, self).__init__(request)
-        self.require_login(came_from='view_files')
+class FilesView(LoggedInView):
 
     @view_config(request_method='POST')
     def upload_file(self):
