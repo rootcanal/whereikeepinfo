@@ -5,8 +5,6 @@ import os
 import logging
 
 from pyramid.response import FileResponse
-from pyramid_simpleform.renderers import FormRenderer
-from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -29,7 +27,6 @@ class KeyView(LoggedInView):
     @view_config(request_method='POST')
     def genkey(self):
         self.require_verification()
-        form = Form(self.request, schema=forms.GenKeySchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
 
@@ -61,7 +58,6 @@ class KeyView(LoggedInView):
     @view_config(route_name='export_key', renderer='whereikeepinfo:templates/export_key.pt')
     def export_key(self):
         self.require_verification()
-        form = Form(self.request, schema=forms.PassphraseSchema)
         if 'form.submitted' in self.request.POST and form.validate():
             with utils.db_session(self.dbmaker) as session:
                 user = session.query(User).filter(User.username==self.username).first()
@@ -83,7 +79,6 @@ class KeyView(LoggedInView):
                     )
                     return response
         return dict(
-            form=FormRenderer(form),
             username=self.username,
             key=self.key
         )

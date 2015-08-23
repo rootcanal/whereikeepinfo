@@ -8,7 +8,6 @@ import logging
 import gnupg
 from passlib.hash import bcrypt
 from itsdangerous import URLSafeTimedSerializer
-from pyramid_simpleform import Form
 from pyramid.security import authenticated_userid
 
 from whereikeepinfo.models import User

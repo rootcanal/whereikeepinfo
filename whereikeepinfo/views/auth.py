@@ -2,8 +2,6 @@ import smtplib
 import time
 import logging
 
-from pyramid_simpleform.renderers import FormRenderer
-from pyramid_simpleform import Form
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 from pyramid.security import remember
@@ -49,8 +47,6 @@ class AuthView(BaseView):
 
     @view_config(route_name='register', renderer='whereikeepinfo:templates/register.pt')
     def register(self):
-        form = Form(self.request, schema=forms.RegistrationSchema)
-    
         if 'form.submitted' in self.request.POST and form.validate():
             username = form.data['username']
             user = User(
@@ -66,7 +62,6 @@ class AuthView(BaseView):
             return HTTPFound(location=self.request.route_url('send_verify'), headers=headers)
     
         return dict(
-            form=FormRenderer(form),
             username=self.username
         )
 
@@ -76,7 +71,6 @@ class AuthView(BaseView):
         if not email:
             self.request.session.flash(u'Unable to verify your email account')
             return HTTPFound(location=self.request.route_url('home'))
-        form = Form(self.request, schema=forms.LoginSchema)
         if 'form.submitted' in self.request.POST:
             if not utils.authenticate_user(form, self.dbmaker):
                 self.request.session.flash(u'Failed to verify your account credentials')
@@ -90,7 +84,6 @@ class AuthView(BaseView):
                 self.request.session.flash(u'Account verified!')
                 return HTTPFound(location=self.request.route_url('keys'))
         return dict(
-            form=FormRenderer(form),
             username=self.username,
             token=self.token
         )
@@ -122,7 +115,6 @@ class AuthView(BaseView):
     @view_config(route_name='login', renderer='whereikeepinfo:templates/login.pt')
     def login(self):
         came_from = self.request.params.get('came_from', self.request.route_url('home'))
-        form = Form(self.request, schema=forms.LoginSchema)
         if 'form.submitted' in self.request.POST:
             if utils.authenticate_user(form, self.dbmaker):
                 headers = remember(self.request, form.data['username'])
@@ -131,7 +123,6 @@ class AuthView(BaseView):
             self.request.session.flash(u'Failed to login.')
             return HTTPFound(location=came_from)
         return dict(
-            form=FormRenderer(form),
             username=self.username,
             came_from=came_from
         )

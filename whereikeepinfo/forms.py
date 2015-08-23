@@ -1,8 +1,6 @@
 import formencode
 import os
 
-from pyramid_simpleform import Form
-
 
 class FileValidator(formencode.FancyValidator):
     __unpackargs__ = ('upload_field', 'max_upload_size')

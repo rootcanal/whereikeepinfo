@@ -5,8 +5,6 @@ import mimetypes
 import logging
 
 from pyramid.response import FileResponse
-from pyramid_simpleform.renderers import FormRenderer
-from pyramid_simpleform import Form
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.view import view_config
@@ -29,7 +27,6 @@ class FilesView(LoggedInView):
     @view_config(request_method='POST')
     def upload_file(self):
         self.require_key()
-        form = Form(self.request, schema=forms.UploadFileSchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
 
@@ -55,7 +52,6 @@ class FilesView(LoggedInView):
     @view_config(request_method='GET')
     def view_files(self):
         self.require_verification()
-        form = Form(self.request, schema=forms.UploadFileSchema)
         with utils.db_session(self.dbmaker) as session:
             user = session.query(User).filter(User.username==self.username).first()
             current_upload_size = sum([f.size for f in user.files])
@@ -73,7 +69,6 @@ class FilesView(LoggedInView):
 
         return dict(
             current_upload_size=current_upload_size,
-            form=FormRenderer(form),
             username=username,
             uploaded_files=owned_files,
             sharable_users=sharable_users,
@@ -108,7 +103,6 @@ class FilesView(LoggedInView):
 
     @view_config(route_name='view_file', renderer='whereikeepinfo:templates/view_file.pt')
     def view_file(self):
-        form = Form(self.request, schema=forms.PassphraseSchema)
         if 'form.submitted' in self.request.POST and form.validate():
             with utils.db_session(self.dbmaker) as session:
                 user = session.query(User).filter(User.username==self.username).first()
@@ -143,7 +137,6 @@ class FilesView(LoggedInView):
                     )
                     return response
         return dict(
-            form=FormRenderer(form),
             username=self.username,
             filename=self.filename
         )
@@ -160,7 +153,6 @@ class FilesView(LoggedInView):
 
     @view_config(route_name='share_file', renderer='whereikeepinfo:templates/share_file.pt')
     def share_file(self):
-        form = Form(self.request, schema=forms.PassphraseSchema)
         if 'form.submitted' in self.request.POST and form.validate():
             passphrase = form.data['passphrase']
             query_file = os.path.join(self.storage_dir, self.username, self.filename)
